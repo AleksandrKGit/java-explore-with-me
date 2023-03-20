@@ -43,16 +43,16 @@ class StatControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    final static String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
-    final static String validHitJson = "{\"app\":\"appName\",\"uri\":\"https://ya.ru\",\"ip\":\"192.168.0.1\"," +
+    static final String validHitJson = "{\"app\":\"appName\",\"uri\":\"https://ya.ru\",\"ip\":\"192.168.0.1\"," +
             "\"timestamp\":\"2023-03-10 00:00:00\"}";
 
-    final static String validStart = "2023-03-10 00:00:00";
+    static final String validStart = "2023-03-10 00:00:00";
 
-    final static String validEnd = "2023-03-12 00:00:00";
+    static final String validEnd = "2023-03-12 00:00:00";
 
-    final static String validUris = "https://ya.ru";
+    static final String validUris = "https://ya.ru";
 
     private static Stream<Arguments> badRequest() {
         String incorrectJson = "}";

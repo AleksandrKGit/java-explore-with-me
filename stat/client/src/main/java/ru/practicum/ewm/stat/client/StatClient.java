@@ -16,7 +16,7 @@ import java.util.Map;
 public class StatClient {
     protected final RestTemplate restTemplate;
 
-    private final static String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    private static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     public StatClient(String serverUrl, RestTemplateBuilder builder) {
         restTemplate = builder.uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))

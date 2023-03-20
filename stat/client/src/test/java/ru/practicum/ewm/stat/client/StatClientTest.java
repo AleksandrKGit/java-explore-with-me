@@ -80,7 +80,7 @@ class StatClientTest {
         assertThat(response.getStatusCode(), equalTo(HttpStatus.CREATED));
     }
 
-    final static String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     @Test
     void stats_shouldReturnResultOfStatsRequestToStatServer() throws Exception {

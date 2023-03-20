@@ -18,7 +18,7 @@ class StatMapperTest {
     @Autowired
     StatMapper statMapper;
 
-    final static String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     @Test
     void toEntity_withNotNullFields_shouldReturnEntityWithNotNullFieldsAndNullItem() {

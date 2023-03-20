@@ -29,7 +29,7 @@ class StatServiceTest {
     @MockBean
     StatRepository repository;
 
-    final static String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     @Test
     void create_shouldSaveEndpointHitEntityFromDto() {

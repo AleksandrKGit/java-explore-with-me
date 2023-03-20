@@ -41,7 +41,7 @@ public class StatControllerIntegrationTests {
     @Autowired
     ObjectMapper objectMapper;
 
-    final static String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     @BeforeEach
     void setUp() {
