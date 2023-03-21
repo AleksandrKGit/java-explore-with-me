@@ -34,7 +34,7 @@ import static org.mockserver.model.JsonBody.json;
 class StatClientTest {
     static ClientAndServer mockStatServer;
 
-    static final Integer serverPort = 9090;
+    static final Integer serverPort = 9091;
 
     static String serverHost;
 

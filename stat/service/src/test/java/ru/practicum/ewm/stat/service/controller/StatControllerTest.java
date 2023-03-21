@@ -1,4 +1,4 @@
-package ru.practicum.ewm.stat.service;
+package ru.practicum.ewm.stat.service.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
@@ -102,7 +102,7 @@ class StatControllerTest {
     }
 
     @Test
-    void request_withHitEndPoint_shouldReturnStatusOkInvokeServiceCreateMethod() throws Exception {
+    void request_withHitEndPoint_shouldReturnStatusCreatedAndInvokeServiceCreateMethod() throws Exception {
         EndpointHitDto validEndpointHitDto = new EndpointHitDto();
         validEndpointHitDto.setApp("appName");
         validEndpointHitDto.setUri("https://ya.ru");
@@ -114,7 +114,7 @@ class StatControllerTest {
         mockMvc.perform(post("/hit")
                         .content(objectMapper.writeValueAsString(validEndpointHitDto))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         EndpointHitDto resultEndpointHitDto = endpointHitDtoArgumentCaptor.getValue();
         assertThat(resultEndpointHitDto, allOf(
