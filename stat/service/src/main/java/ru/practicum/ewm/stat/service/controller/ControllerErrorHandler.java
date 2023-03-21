@@ -12,14 +12,14 @@ import java.time.format.DateTimeParseException;
 @ControllerAdvice
 public class ControllerErrorHandler {
     @ExceptionHandler
-    public ResponseEntity<?> handleException(Exception ignored) {
-        return ResponseEntity.internalServerError().body(null);
+    public ResponseEntity<Void> handleException(Exception ignored) {
+        return ResponseEntity.internalServerError().build();
     }
 
     @ExceptionHandler({HttpMessageNotReadableException.class, DateTimeParseException.class,
             MissingServletRequestParameterException.class, MethodArgumentTypeMismatchException.class,
             HttpMediaTypeNotSupportedException.class})
-    public ResponseEntity<?> handleBadRequestException(Exception ignored) {
-        return ResponseEntity.badRequest().body(null);
+    public ResponseEntity<Void> handleBadRequestException(Exception ignored) {
+        return ResponseEntity.badRequest().build();
     }
 }

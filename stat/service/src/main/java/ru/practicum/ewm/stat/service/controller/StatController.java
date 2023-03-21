@@ -22,9 +22,9 @@ public class StatController {
     StatService service;
 
     @PostMapping("/hit")
-    public ResponseEntity<?> hit(@RequestBody EndpointHitDto dto) {
+    public ResponseEntity<Void> hit(@RequestBody EndpointHitDto dto) {
         service.create(dto);
-        return new ResponseEntity<>(null, HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping("/stats")
