@@ -39,8 +39,8 @@ public class EventPublicController {
                                                     @Min(value = 1, message = "must not be less than 1")
                                                     @RequestParam(required = false, defaultValue = "10") Integer size,
                                                     HttpServletRequest request) {
-        List<EventShortDto> dtoList = service.find(request.getRemoteAddr(), text, categories, paid, dateOf(rangeStart),
-                dateOf(rangeEnd), onlyAvailable, EventSort.valueOf(sort), from, size);
+        List<EventShortDto> dtoList = service.find(request.getRemoteAddr(), request.getRequestURI(), text, categories,
+                paid, dateOf(rangeStart), dateOf(rangeEnd), onlyAvailable, EventSort.valueOf(sort), from, size);
 
         return ResponseEntity.ok(dtoList);
     }

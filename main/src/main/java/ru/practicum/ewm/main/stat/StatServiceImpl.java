@@ -7,14 +7,10 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.util.Pair;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.util.DefaultUriBuilderFactory;
-import ru.practicum.ewm.main.event.controller.EventSort;
 import ru.practicum.ewm.main.exception.StatServiceException;
-import ru.practicum.ewm.stat.client.QueryParameters;
 import ru.practicum.ewm.stat.client.StatClient;
 import ru.practicum.ewm.stat.dto.EndpointHit;
 import ru.practicum.ewm.stat.dto.ViewStats;
-import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,31 +27,7 @@ public class StatServiceImpl implements StatService {
 
     ObjectMapper objectMapper;
 
-    private static final String app = "ewm-main";
-
-    private String getFindUri(String text, List<Long> categoryIds, Boolean paid, LocalDateTime start,
-                                   LocalDateTime end, Boolean onlyAvailable, EventSort sort, Integer from,
-                                   Integer size) {
-        QueryParameters params = new QueryParameters();
-        params.add("text", text);
-        params.add("categoryIds", categoryIds == null ? null : categoryIds.stream().map(String::valueOf)
-                .collect(Collectors.joining(",")));
-        params.add("paid", paid);
-        params.add("start", ofDate(start));
-        params.add("end", ofDate(end));
-        params.add("onlyAvailable", onlyAvailable);
-        params.add("sort", sort);
-        params.add("from", from);
-        params.add("size", size);
-
-        String endPoint = "/events" + params.getQuery();
-
-        DefaultUriBuilderFactory uriBuilderFactory = new DefaultUriBuilderFactory();
-        uriBuilderFactory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.VALUES_ONLY);
-        URI uri = uriBuilderFactory.expand(endPoint, params.getParameters());
-
-        return uri.toString();
-    }
+    private static final String app = "ewm-main-service";
 
     private String getEventUri(Long id) {
         return "/events/" + id;
@@ -121,10 +93,8 @@ public class StatServiceImpl implements StatService {
     }
 
     @Override
-    public void addFindEventsEndPoint(String ip, String text, List<Long> categoryIds, Boolean paid, LocalDateTime start,
-                                      LocalDateTime end, Boolean onlyAvailable, EventSort sort, Integer from,
-                                      Integer size) {
-        hit(ip, getFindUri(text, categoryIds, paid, start, end, onlyAvailable, sort, from, size));
+    public void addFindEventsEndPoint(String ip, String uri) {
+        hit(ip, uri);
     }
 
     @Override

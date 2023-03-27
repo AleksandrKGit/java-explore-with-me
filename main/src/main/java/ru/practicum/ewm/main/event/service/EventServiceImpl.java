@@ -100,10 +100,10 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventShortDto> find(String ip, String text, List<Long> categoryIds, Boolean paid, LocalDateTime start,
-                                    LocalDateTime end, Boolean onlyAvailable, EventSort sort, Integer from,
-                                    Integer size) {
-        statService.addFindEventsEndPoint(ip, text, categoryIds, paid, start, end, onlyAvailable, sort, from, size);
+    public List<EventShortDto> find(String ip, String uri, String text, List<Long> categoryIds, Boolean paid,
+                                    LocalDateTime start, LocalDateTime end, Boolean onlyAvailable, EventSort sort,
+                                    Integer from, Integer size) {
+        statService.addFindEventsEndPoint(ip, uri);
 
         List<Long> ids = repository.findByQuery(text, categoryIds, paid, start, end, onlyAvailable, from, size, sort);
 

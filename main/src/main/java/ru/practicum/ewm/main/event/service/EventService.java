@@ -13,8 +13,9 @@ public interface EventService {
 
     EventFullDto getByInitiator(Long userId, Long id);
 
-    List<EventShortDto> find(String ip, String text, List<Long> categoryIds, Boolean paid, LocalDateTime start,
-                             LocalDateTime end, Boolean onlyAvailable, EventSort sort, Integer from, Integer size);
+    List<EventShortDto> find(String ip, String uri, String text, List<Long> categoryIds, Boolean paid,
+                             LocalDateTime start, LocalDateTime end, Boolean onlyAvailable, EventSort sort,
+                             Integer from, Integer size);
 
     List<EventShortDto> findByInitiator(Long userId, Integer from, Integer size);
 
