@@ -13,8 +13,8 @@ import org.mockserver.model.Parameter;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import ru.practicum.ewm.stat.dto.EndpointHitDto;
-import ru.practicum.ewm.stat.dto.ViewStatsDto;
+import ru.practicum.ewm.stat.dto.EndpointHit;
+import ru.practicum.ewm.stat.dto.ViewStats;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -47,7 +47,7 @@ class StatClientTest {
         mockStatServer = startClientAndServer(serverPort);
         serverHost = mockStatServer.remoteAddress().getHostName();
         client = new StatClient("http://" + serverHost + ":" + serverPort, new RestTemplateBuilder());
-        objectMapper = new ObjectMapper();
+        objectMapper = new ObjectMapper().findAndRegisterModules();
     }
 
     @AfterAll
@@ -57,17 +57,17 @@ class StatClientTest {
 
     @Test
     void hit_shouldReturnResultOfHitRequestToStatServer() {
-        EndpointHitDto endpointHitDto = new EndpointHitDto();
-        endpointHitDto.setApp("appName");
-        endpointHitDto.setUri("https://ya.ru");
-        endpointHitDto.setIp("192.168.0.1");
-        endpointHitDto.setTimestamp("2023-03-12 00:00:00");
+        EndpointHit endpointHit = new EndpointHit();
+        endpointHit.setApp("appName");
+        endpointHit.setUri("https://ya.ru");
+        endpointHit.setIp("192.168.0.1");
+        endpointHit.setTimestamp("2023-03-12 00:00:00");
         mockStatServer.when(
                         request()
                                 .withMethod("POST")
                                 .withHeader(new Header("Content-type", "application/json"))
-                                .withBody(json(endpointHitDto))
-                                .withPath("/hits"),
+                                .withBody(json(endpointHit))
+                                .withPath("/hit"),
                         exactly(1)
                 )
                 .respond(
@@ -75,16 +75,47 @@ class StatClientTest {
                                 .withStatusCode(HttpStatus.CREATED.value())
                 );
 
-        ResponseEntity<String> response = client.hit(endpointHitDto);
+        ResponseEntity<String> response = client.hit(endpointHit);
 
         assertThat(response.getStatusCode(), equalTo(HttpStatus.CREATED));
+    }
+
+    @Test
+    void hit_withServerInternalError_shouldReturnResponseEntityWithInternalServerErrorStatus() {
+        EndpointHit endpointHit = new EndpointHit();
+        endpointHit.setApp("appName");
+        endpointHit.setUri("https://ya.ru");
+        endpointHit.setIp("192.168.0.1");
+        endpointHit.setTimestamp("2023-03-12 00:00:00");
+
+        HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+        String body = "errorBody";
+
+        mockStatServer.when(
+                        request()
+                                .withMethod("POST")
+                                .withHeader(new Header("Content-type", "application/json"))
+                                .withBody(json(endpointHit))
+                                .withPath("/hit"),
+                        exactly(1)
+                )
+                .respond(
+                        response()
+                                .withBody(body)
+                                .withStatusCode(httpStatus.value())
+                );
+
+        ResponseEntity<String> response = client.hit(endpointHit);
+
+        assertThat(response.getStatusCode(), equalTo(httpStatus));
+        assertThat(response.getBody(), equalTo(body));
     }
 
     static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     @Test
     void stats_shouldReturnResultOfStatsRequestToStatServer() throws Exception {
-        List<ViewStatsDto> viewStatsDtoList = List.of(new ViewStatsDto("appName", "https://ya.ru", 1L));
+        List<ViewStats> viewStatsList = List.of(new ViewStats("appName", "https://ya.ru", 1L));
         String startStr = "2023-03-10 00:00:00";
         String endStr = "2023-03-12 00:00:00";
         LocalDateTime start = LocalDateTime.parse(startStr, DateTimeFormatter.ofPattern(DATE_PATTERN));
@@ -107,17 +138,17 @@ class StatClientTest {
                         response()
                                 .withContentType(MediaType.APPLICATION_JSON)
                                 .withStatusCode(HttpStatus.OK.value())
-                                .withBody(json(objectMapper.writeValueAsString(viewStatsDtoList)))
+                                .withBody(json(objectMapper.writeValueAsString(viewStatsList)))
                 );
 
         ResponseEntity<String> response = client.stats(start, end, uris, unique);
 
         assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
 
-        List<ViewStatsDto> result = objectMapper.readValue(response.getBody(),
-                objectMapper.getTypeFactory().constructCollectionType(List.class, ViewStatsDto.class));
+        List<ViewStats> result = objectMapper.readValue(response.getBody(),
+                objectMapper.getTypeFactory().constructCollectionType(List.class, ViewStats.class));
 
-        assertThat(result, contains(viewStatsDtoList.stream().map(dto -> allOf(
+        assertThat(result, contains(viewStatsList.stream().map(dto -> allOf(
                 hasProperty("app", equalTo(dto.getApp())),
                 hasProperty("uri", equalTo(dto.getUri())),
                 hasProperty("hits", equalTo(dto.getHits()))

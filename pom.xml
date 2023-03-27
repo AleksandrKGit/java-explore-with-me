@@ -5,6 +5,7 @@
     <modules>
         <module>stat</module>
         <module>common</module>
+        <module>main</module>
     </modules>
 
 	<parent>

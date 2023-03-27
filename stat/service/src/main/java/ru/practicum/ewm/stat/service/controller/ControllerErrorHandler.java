@@ -8,24 +8,24 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import ru.practicum.ewm.common.dto.ExceptionDto;
+import ru.practicum.ewm.common.dto.ApiError;
 import java.time.format.DateTimeParseException;
 
 @ControllerAdvice
 public class ControllerErrorHandler {
+    private ResponseEntity<ApiError> getResponseEntity(HttpStatus status, Exception ex, String reason) {
+        return new ResponseEntity<>(new ApiError(status, reason, ex), status);
+    }
+
     @ExceptionHandler
-    public ResponseEntity<ExceptionDto> handleException(Exception exception) {
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        return new ResponseEntity<>(new ExceptionDto(status, "Stat service error.", exception.getMessage()),
-                status);
+    public ResponseEntity<ApiError> handleException(Exception ex) {
+        return getResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, ex, "Stat service error.");
     }
 
     @ExceptionHandler({HttpMessageNotReadableException.class, DateTimeParseException.class,
             MissingServletRequestParameterException.class, MethodArgumentTypeMismatchException.class,
             HttpMediaTypeNotSupportedException.class})
-    public ResponseEntity<ExceptionDto> handleBadRequestException(Exception exception) {
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-        return new ResponseEntity<>(new ExceptionDto(status, "Incorrectly made request.",
-                exception.getMessage()), status);
+    public ResponseEntity<ApiError> handleBadRequestException(Exception ex) {
+        return getResponseEntity(HttpStatus.BAD_REQUEST, ex, "Incorrectly made request.");
     }
 }

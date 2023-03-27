@@ -11,11 +11,12 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import ru.practicum.ewm.stat.dto.EndpointHitDto;
-import ru.practicum.ewm.stat.dto.ViewStatsDto;
+import ru.practicum.ewm.stat.dto.EndpointHit;
+import ru.practicum.ewm.stat.dto.ViewStats;
 import ru.practicum.ewm.stat.service.service.StatService;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -28,8 +29,9 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static ru.practicum.ewm.stat.service.tools.matchers.LocalDateTimeMatcher.near;
 
 @WebMvcTest(StatController.class)
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -103,40 +105,65 @@ class StatControllerTest {
 
     @Test
     void request_withHitEndPoint_shouldReturnStatusCreatedAndInvokeServiceCreateMethod() throws Exception {
-        EndpointHitDto validEndpointHitDto = new EndpointHitDto();
-        validEndpointHitDto.setApp("appName");
-        validEndpointHitDto.setUri("https://ya.ru");
-        validEndpointHitDto.setIp("192.168.0.1");
-        validEndpointHitDto.setTimestamp("2023-03-12 00:00:00");
-        ArgumentCaptor<EndpointHitDto> endpointHitDtoArgumentCaptor = ArgumentCaptor.forClass(EndpointHitDto.class);
+        EndpointHit validEndpointHit = new EndpointHit();
+        validEndpointHit.setApp("appName");
+        validEndpointHit.setUri("https://ya.ru");
+        validEndpointHit.setIp("192.168.0.1");
+        validEndpointHit.setTimestamp("2023-03-12 00:00:00");
+        ArgumentCaptor<EndpointHit> endpointHitDtoArgumentCaptor = ArgumentCaptor.forClass(EndpointHit.class);
         doNothing().when(service).create(endpointHitDtoArgumentCaptor.capture());
 
         mockMvc.perform(post("/hit")
-                        .content(objectMapper.writeValueAsString(validEndpointHitDto))
+                        .content(objectMapper.writeValueAsString(validEndpointHit))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
-        EndpointHitDto resultEndpointHitDto = endpointHitDtoArgumentCaptor.getValue();
-        assertThat(resultEndpointHitDto, allOf(
-                hasProperty("app", equalTo(validEndpointHitDto.getApp())),
-                hasProperty("uri", equalTo(validEndpointHitDto.getUri())),
-                hasProperty("ip", equalTo(validEndpointHitDto.getIp())),
-                hasProperty("timestamp", equalTo(validEndpointHitDto.getTimestamp()))
+        EndpointHit resultEndpointHit = endpointHitDtoArgumentCaptor.getValue();
+        assertThat(resultEndpointHit, allOf(
+                hasProperty("app", equalTo(validEndpointHit.getApp())),
+                hasProperty("uri", equalTo(validEndpointHit.getUri())),
+                hasProperty("ip", equalTo(validEndpointHit.getIp())),
+                hasProperty("timestamp", equalTo(validEndpointHit.getTimestamp()))
         ));
     }
 
     @Test
-    void request_withStatsEndPoint_shouldReturnStatusOkAndServiceCreateMethodResult() throws Exception {
-        List<ViewStatsDto> viewStatsDtoList = List.of(new ViewStatsDto("appName", "https://ya.ru", 1L));
+    void request_withStatsEndPointAndRuntimeExceptionThrownByServiceCreateMethod_shouldReturnStatusInternalServerErrorAndApiError()
+            throws Exception {
+        String message = "exceptionMessage";
+        RuntimeException exception = new RuntimeException(message);
         LocalDateTime start = LocalDateTime.parse(validStart, DateTimeFormatter.ofPattern(DATE_PATTERN));
         LocalDateTime end = LocalDateTime.parse(validEnd, DateTimeFormatter.ofPattern(DATE_PATTERN));
         ArgumentCaptor<String[]> urisArgumentCaptor = ArgumentCaptor.forClass(String[].class);
         String[] uris = new String[] {validUris};
         when(service.find(eq(start), eq(end), urisArgumentCaptor.capture(), eq(false)))
-                .thenReturn(viewStatsDtoList);
+                .thenThrow(exception);
 
         mockMvc.perform(get("/stats?start=" + validStart + "&end=" + validEnd + "&uris=" + validUris))
-                .andExpect(content().json(objectMapper.writeValueAsString(viewStatsDtoList)))
+                .andExpectAll(
+                        status().isInternalServerError(),
+                        jsonPath("$.status", is(HttpStatus.INTERNAL_SERVER_ERROR.name())),
+                        jsonPath("$.reason", is("Stat service error.")),
+                        jsonPath("$.message", is(message)),
+                        jsonPath("$.timestamp", is(near(LocalDateTime.now(), DATE_PATTERN)))
+                );
+
+        String[] requestUris = urisArgumentCaptor.getValue();
+        assertThat(requestUris, arrayContainingInAnyOrder(uris));
+    }
+
+    @Test
+    void request_withStatsEndPoint_shouldReturnStatusOkAndServiceCreateMethodResult() throws Exception {
+        List<ViewStats> viewStatsList = List.of(new ViewStats("appName", "https://ya.ru", 1L));
+        LocalDateTime start = LocalDateTime.parse(validStart, DateTimeFormatter.ofPattern(DATE_PATTERN));
+        LocalDateTime end = LocalDateTime.parse(validEnd, DateTimeFormatter.ofPattern(DATE_PATTERN));
+        ArgumentCaptor<String[]> urisArgumentCaptor = ArgumentCaptor.forClass(String[].class);
+        String[] uris = new String[] {validUris};
+        when(service.find(eq(start), eq(end), urisArgumentCaptor.capture(), eq(false)))
+                .thenReturn(viewStatsList);
+
+        mockMvc.perform(get("/stats?start=" + validStart + "&end=" + validEnd + "&uris=" + validUris))
+                .andExpect(content().json(objectMapper.writeValueAsString(viewStatsList)))
                 .andExpect(status().isOk());
 
         String[] requestUris = urisArgumentCaptor.getValue();
