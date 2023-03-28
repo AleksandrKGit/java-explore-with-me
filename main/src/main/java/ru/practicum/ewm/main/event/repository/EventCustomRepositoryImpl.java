@@ -72,21 +72,6 @@ public class EventCustomRepositoryImpl implements EventCustomRepository {
     }
 
     @Override
-    public List<Long> findInitiatorEvents(Long userId, Integer from, Integer size) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-
-        CriteriaQuery<Long> query = cb.createQuery(Long.class);
-        Root<Event> events = query.from(Event.class);
-
-        return entityManager.createQuery(query
-                        .select(events.get("id"))
-                        .where(cb.equal(events.get("initiator"), userId)))
-                .setFirstResult(from)
-                .setMaxResults(size)
-                .getResultList();
-    }
-
-    @Override
     public List<Long> findByAdmin(List<Long> userIds, List<EventState> states, List<Long> categoryIds,
                                   LocalDateTime start, LocalDateTime end, Integer from, Integer size) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();

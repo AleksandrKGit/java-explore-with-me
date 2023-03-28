@@ -1,28 +1,27 @@
 package ru.practicum.ewm.stat.service.model;
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import ru.practicum.ewm.stat.service.tools.HitFactory;
 import java.time.LocalDateTime;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
 
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 class HitTest {
-    Long id = 1L;
-    String app = "appName";
-    String uri = "https://ya.ru";
-    String ip = "192.168.0.1";
-    LocalDateTime timestamp = LocalDateTime.now();
+    private final Long id = 1L;
 
+    private Hit createHit(Long id, boolean nullOtherFields) {
+        return nullOtherFields ? HitFactory.createHit(id, null, null, null, null)
+                : HitFactory.createHit(id, "appName", "https://ya.ru", "192.168.0.1", LocalDateTime.now());
+    }
+    
     @SuppressWarnings("all")
     @Test
     void equals_withSameObjectWithNullIdAndOtherFields_shouldReturnTrue() {
-        Hit hit = createEndpointHit(null, null, null, null, null);
+        Hit hit = createHit(null, true);
 
         assertThat(hit.equals(hit), is(true));
     }
@@ -30,7 +29,7 @@ class HitTest {
     @SuppressWarnings("all")
     @Test
     void equals_withNullAndNullIdAndOtherFields_shouldReturnFalse() {
-        Hit hit = createEndpointHit(null, null, null, null, null);
+        Hit hit = createHit(null, true);
 
         assertThat(hit.equals(null), is(false));
     }
@@ -38,7 +37,7 @@ class HitTest {
     @SuppressWarnings("all")
     @Test
     void equals_withObjectOfOtherClassWithNotNullIdAndNullOtherFields_shouldReturnFalse() {
-        Hit hit = createEndpointHit(id, null, null, null, null);
+        Hit hit = createHit(id, true);
         OtherObject otherObject = new OtherObject(id);
 
         assertThat(hit.equals(otherObject), is(false));
@@ -46,16 +45,16 @@ class HitTest {
 
     @Test
     void equals_withNullIdsAndNotNullEqualOtherFields_shouldReturnFalse() {
-        Hit hit1 = createEndpointHit(null, app, uri, ip, timestamp);
-        Hit hit2 = createEndpointHit(null, app, uri, ip, timestamp);
+        Hit hit1 = createHit(null, false);
+        Hit hit2 = createHit(null, false);
 
         assertThat(hit1.equals(hit2), is(false));
     }
 
     @Test
     void equals_withNotNullEqualIdsAndNotEqualOtherFields_shouldReturnTrue() {
-        Hit hit1 = createEndpointHit(id, null, null, null, null);
-        Hit hit2 = createEndpointHit(id, app, uri, ip, timestamp);
+        Hit hit1 = createHit(id, true);
+        Hit hit2 = createHit(id, false);
 
         assertThat(hit1.equals(hit2), is(true));
     }
@@ -64,16 +63,16 @@ class HitTest {
     @NullSource
     @ValueSource(longs = {1L})
     void hashCode_ofTwoEndpointHitsWithEqualIdsAndNotEqualOtherFields_shouldBeEqual(Long id) {
-        Hit hit1 = createEndpointHit(id, app, uri, ip, timestamp);
-        Hit hit2 = createEndpointHit(id, null, null, null, null);
+        Hit hit1 = createHit(id, false);
+        Hit hit2 = createHit(id, true);
 
         assertThat(hit1.hashCode(), equalTo(hit2.hashCode()));
     }
 
     @Test
     void hashCode_ofTwoEndpointHitsWithNullAndZeroIdsAndNotEqualOtherFields_shouldBeEqual() {
-        Hit hit1 = createEndpointHit(null, app, uri, ip, timestamp);
-        Hit hit2 = createEndpointHit(0L, null, null, null, null);
+        Hit hit1 = createHit(null, false);
+        Hit hit2 = createHit(0L, true);
 
         assertThat(hit1.hashCode(), equalTo(hit2.hashCode()));
     }
@@ -82,20 +81,10 @@ class HitTest {
     @NullSource
     @ValueSource(longs = {1L})
     void hashCode_ofTwoEndpointHitsWithNotEqualIdsAndEqualOtherFields_shouldNotBeEqual(Long id) {
-        Hit hit1 = createEndpointHit(id, app, uri, ip, timestamp);
-        Hit hit2 = createEndpointHit(2L, app, uri, ip, timestamp);
+        Hit hit1 = createHit(id, false);
+        Hit hit2 = createHit(2L, false);
 
         assertThat(hit1.hashCode(), not(equalTo(hit2.hashCode())));
-    }
-
-    Hit createEndpointHit(Long id, String app, String uri, String ip, LocalDateTime timestamp) {
-        Hit hit = new Hit();
-        hit.setId(id);
-        hit.setApp(app);
-        hit.setUri(uri);
-        hit.setIp(ip);
-        hit.setTimestamp(timestamp);
-        return hit;
     }
 
     @SuppressWarnings("all")

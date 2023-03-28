@@ -3,6 +3,7 @@ package ru.practicum.ewm.main.category.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import org.junit.ClassRule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +13,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.testcontainers.containers.PostgreSQLContainer;
 import ru.practicum.ewm.main.category.dto.CategoryDto;
 import ru.practicum.ewm.main.controller.ControllerErrorHandler;
 import ru.practicum.ewm.main.category.Category;
 import ru.practicum.ewm.main.category.dto.NewCategoryDto;
+import ru.practicum.ewm.main.tools.PostgresqlTestContainer;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -34,6 +37,10 @@ import static ru.practicum.ewm.main.tools.matchers.LocalDateTimeMatcher.near;
 @AutoConfigureTestDatabase
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CategoryAdminControllerIntegrationTests {
+    @ClassRule
+    public static PostgreSQLContainer<PostgresqlTestContainer> postgreSQLContainer =
+            PostgresqlTestContainer.getInstance();
+
     MockMvc mockMvc;
 
     @Autowired

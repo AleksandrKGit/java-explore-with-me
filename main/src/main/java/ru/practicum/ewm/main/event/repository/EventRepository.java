@@ -1,5 +1,6 @@
 package ru.practicum.ewm.main.event.repository;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -27,4 +28,7 @@ public interface EventRepository extends JpaRepository<Event, Long>, EventCustom
     @Modifying
     @Query("UPDATE Event e SET e.confirmedRequests = e.confirmedRequests - 1 WHERE e.id = ?1")
     void decrementConfirmedEvents(Long id);
+
+    @Query("SELECT e.id FROM Event e WHERE e.initiator.id = ?1")
+    List<Long> findByInitiator(Long userId, Pageable pageable);
 }

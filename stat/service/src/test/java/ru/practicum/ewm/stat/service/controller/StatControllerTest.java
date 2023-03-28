@@ -145,7 +145,7 @@ class StatControllerTest {
                         jsonPath("$.status", is(HttpStatus.INTERNAL_SERVER_ERROR.name())),
                         jsonPath("$.reason", is("Stat service error.")),
                         jsonPath("$.message", is(message)),
-                        jsonPath("$.timestamp", is(near(LocalDateTime.now(), DATE_PATTERN)))
+                        jsonPath("$.timestamp", is(near(LocalDateTime.now())))
                 );
 
         String[] requestUris = urisArgumentCaptor.getValue();

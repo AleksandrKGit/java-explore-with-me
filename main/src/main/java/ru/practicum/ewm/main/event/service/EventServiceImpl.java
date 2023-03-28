@@ -3,6 +3,7 @@ package ru.practicum.ewm.main.event.service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.main.category.Category;
@@ -22,6 +23,7 @@ import ru.practicum.ewm.main.exception.ForbiddenException;
 import ru.practicum.ewm.main.exception.NotFoundException;
 import ru.practicum.ewm.main.request.dto.ParticipationRequestDto;
 import ru.practicum.ewm.main.stat.StatService;
+import ru.practicum.ewm.main.support.OffsetPageRequest;
 import ru.practicum.ewm.main.user.User;
 import ru.practicum.ewm.main.user.UserRepository;
 import java.time.LocalDateTime;
@@ -125,7 +127,9 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventShortDto> findByInitiator(Long userId, Integer from, Integer size) {
-        List<Long> ids = repository.findInitiatorEvents(userId, from, size);
+        Pageable pageRequest = OffsetPageRequest.ofOffset(from, size, null);
+
+        List<Long> ids = repository.findByInitiator(userId, pageRequest);
 
         if (ids.size() == 0) {
             return List.of();

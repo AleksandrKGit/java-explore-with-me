@@ -5,28 +5,25 @@ import lombok.experimental.FieldDefaults;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import static ru.practicum.ewm.common.support.DateFactory.dateOf;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class LocalDateTimeMatcher extends BaseMatcher<LocalDateTime> {
     LocalDateTime date;
-    DateTimeFormatter formatter;
 
-    private LocalDateTimeMatcher(LocalDateTime date, DateTimeFormatter formatter) {
+    private LocalDateTimeMatcher(LocalDateTime date) {
         this.date = date;
-        this.formatter = formatter;
     }
 
-    public static LocalDateTimeMatcher near(LocalDateTime date, String pattern) {
-        return new LocalDateTimeMatcher(date, DateTimeFormatter.ofPattern(pattern));
+    public static LocalDateTimeMatcher near(LocalDateTime date) {
+        return new LocalDateTimeMatcher(date);
     }
 
     @Override
     public boolean matches(Object item) {
         if (item instanceof String) {
             try {
-                LocalDateTime dateItem = LocalDateTime.parse((String) item, formatter);
-                return !dateItem.isBefore(date.minusSeconds(2)) && !dateItem.isAfter(date.plusSeconds(2));
+                return DateMatcher.near(date, dateOf((String) item));
             } catch (Exception ignored) {
                 return false;
             }

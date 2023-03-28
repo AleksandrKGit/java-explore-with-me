@@ -3,6 +3,7 @@ package ru.practicum.ewm.main.category;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.apache.logging.log4j.util.Strings;
+import org.junit.ClassRule;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -15,8 +16,9 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.testcontainers.containers.PostgreSQLContainer;
 import ru.practicum.ewm.main.support.OffsetPageRequest;
-
+import ru.practicum.ewm.main.tools.PostgresqlTestContainer;
 import javax.transaction.Transactional;
 import java.util.stream.Stream;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -29,6 +31,10 @@ import static ru.practicum.ewm.main.tools.factories.CategoryFactory.createCatego
 @DataJpaTest
 @FieldDefaults(level = AccessLevel.PRIVATE)
 class CategoryRepositoryTest {
+    @ClassRule
+    public static PostgreSQLContainer<PostgresqlTestContainer> postgreSQLContainer =
+            PostgresqlTestContainer.getInstance();
+
     @Autowired
     TestEntityManager em;
 

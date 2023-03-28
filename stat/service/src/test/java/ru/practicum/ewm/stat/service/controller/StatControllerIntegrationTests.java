@@ -3,6 +3,7 @@ package ru.practicum.ewm.stat.service.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import org.junit.ClassRule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +12,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.testcontainers.containers.PostgreSQLContainer;
 import ru.practicum.ewm.stat.dto.EndpointHit;
 import ru.practicum.ewm.stat.service.model.Hit;
-
+import ru.practicum.ewm.stat.service.tools.PostgresqlTestContainer;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -31,6 +33,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureTestDatabase
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class StatControllerIntegrationTests {
+    @ClassRule
+    public static PostgreSQLContainer<PostgresqlTestContainer> postgreSQLContainer =
+            PostgresqlTestContainer.getInstance();
+
     MockMvc mockMvc;
 
     @Autowired

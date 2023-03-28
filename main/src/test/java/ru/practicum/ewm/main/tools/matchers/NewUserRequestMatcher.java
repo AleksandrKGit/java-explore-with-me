@@ -1,8 +1,8 @@
 package ru.practicum.ewm.main.tools.matchers;
 
 import org.mockito.ArgumentMatcher;
+import ru.practicum.ewm.main.tools.factories.UserFactory;
 import ru.practicum.ewm.main.user.dto.NewUserRequest;
-import java.util.Objects;
 
 public class NewUserRequestMatcher implements ArgumentMatcher<NewUserRequest> {
     private final NewUserRequest dto;
@@ -17,8 +17,6 @@ public class NewUserRequestMatcher implements ArgumentMatcher<NewUserRequest> {
 
     @Override
     public boolean matches(NewUserRequest dto) {
-        return dto != null && this.dto != null
-                && Objects.equals(this.dto.getName(), dto.getName())
-                && Objects.equals(this.dto.getEmail(), dto.getEmail());
+        return UserFactory.equals(this.dto, dto);
     }
 }

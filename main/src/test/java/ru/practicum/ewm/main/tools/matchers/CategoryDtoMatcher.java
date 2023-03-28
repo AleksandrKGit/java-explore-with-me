@@ -2,7 +2,7 @@ package ru.practicum.ewm.main.tools.matchers;
 
 import org.mockito.ArgumentMatcher;
 import ru.practicum.ewm.main.category.dto.CategoryDto;
-import java.util.Objects;
+import ru.practicum.ewm.main.tools.factories.CategoryFactory;
 
 public class CategoryDtoMatcher implements ArgumentMatcher<CategoryDto> {
     private final CategoryDto dto;
@@ -17,7 +17,6 @@ public class CategoryDtoMatcher implements ArgumentMatcher<CategoryDto> {
 
     @Override
     public boolean matches(CategoryDto dto) {
-        return dto != null && this.dto != null
-                && Objects.equals(this.dto.getName(), dto.getName());
+        return CategoryFactory.equals(this.dto, dto);
     }
 }

@@ -4,8 +4,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.practicum.ewm.main.compilation.Repository.CompilationRepository;
+import ru.practicum.ewm.main.compilation.CompilationRepository;
 import ru.practicum.ewm.main.compilation.Compilation;
 import ru.practicum.ewm.main.compilation.dto.CompilationDto;
 import ru.practicum.ewm.main.compilation.dto.CompilationMapper;
@@ -14,6 +15,8 @@ import ru.practicum.ewm.main.compilation.dto.UpdateCompilationRequest;
 import ru.practicum.ewm.main.event.repository.EventRepository;
 import ru.practicum.ewm.main.event.model.Event;
 import ru.practicum.ewm.main.exception.NotFoundException;
+import ru.practicum.ewm.main.support.OffsetPageRequest;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -72,7 +75,9 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public List<CompilationDto> find(Boolean pinned, Integer from, Integer size) {
-        List<Long> ids = repository.findByPinned(pinned, from, size);
+        Pageable pageRequest = OffsetPageRequest.ofOffset(from, size, null);
+
+        List<Long> ids = pinned != null ? repository.find(pinned, pageRequest) : repository.find(pageRequest);
 
         if (ids.size() == 0) {
             return List.of();
