@@ -6,7 +6,7 @@ services:
     volumes:
       - /var/lib/postgresql/data/
     ports:
-      - "6541:5432"
+      - "6543:5432"
     environment:
       - POSTGRES_DB=ewmstat
       - POSTGRES_USER=root
@@ -27,9 +27,30 @@ services:
       - DB_HOST=stats-db
       - DB_PORT=5432
 
-#  ewm-service:
-#    ports:
-#      - "8080:8080"
+  ewm-db:
+    container_name: ewmmain_db
+    image: postgres:14-alpine
+    volumes:
+      - /var/lib/postgresql/data/
+    ports:
+      - "6542:5432"
+    environment:
+      - POSTGRES_DB=ewmmain
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
 
-#  ewm-db:
-#    image: postgres:14-alpine
+  ewm-service:
+    container_name: ewmmain_server
+    build: main
+    ports:
+      - "8080:8080"
+    depends_on:
+      - ewm-db
+    environment:
+      - MAIN_PORT=8080
+      - DB_NAME=ewmmain
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - DB_HOST=ewm-db
+      - DB_PORT=5432
+      - STAT_SERVICE_URL=http://stats-server:9090

@@ -7,11 +7,12 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import ru.practicum.ewm.stat.dto.EndpointHitDto;
-import ru.practicum.ewm.stat.dto.ViewStatsDto;
+import ru.practicum.ewm.stat.dto.EndpointHit;
+import ru.practicum.ewm.stat.dto.ViewStats;
 import ru.practicum.ewm.stat.service.StatMapperImpl;
 import ru.practicum.ewm.stat.service.StatRepository;
-import ru.practicum.ewm.stat.service.model.EndpointHit;
+import ru.practicum.ewm.stat.service.model.Hit;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -33,24 +34,24 @@ class StatServiceTest {
 
     @Test
     void create_shouldSaveEndpointHitEntityFromDto() {
-        EndpointHitDto endpointHitDto = new EndpointHitDto();
-        endpointHitDto.setApp("appName");
-        endpointHitDto.setUri("https://ya.ru");
-        endpointHitDto.setIp("192.168.0.1");
-        endpointHitDto.setTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern(DATE_PATTERN)));
-        ArgumentCaptor<EndpointHit> endpointHitArgumentCaptor = ArgumentCaptor.forClass(EndpointHit.class);
+        EndpointHit endpointHit = new EndpointHit();
+        endpointHit.setApp("appName");
+        endpointHit.setUri("https://ya.ru");
+        endpointHit.setIp("192.168.0.1");
+        endpointHit.setTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern(DATE_PATTERN)));
+        ArgumentCaptor<Hit> endpointHitArgumentCaptor = ArgumentCaptor.forClass(Hit.class);
         when(repository.saveAndFlush(endpointHitArgumentCaptor.capture()))
-                .thenAnswer(invocation -> invocation.getArgument(0, EndpointHit.class));
+                .thenAnswer(invocation -> invocation.getArgument(0, Hit.class));
 
-        service.create(endpointHitDto);
+        service.create(endpointHit);
 
-        EndpointHit endpointHitToRepository = endpointHitArgumentCaptor.getValue();
-        assertThat(endpointHitToRepository, allOf(
+        Hit hitToRepository = endpointHitArgumentCaptor.getValue();
+        assertThat(hitToRepository, allOf(
                 hasProperty("id", is(nullValue())),
-                hasProperty("app", equalTo(endpointHitDto.getApp())),
-                hasProperty("uri", equalTo(endpointHitDto.getUri())),
-                hasProperty("ip", equalTo(endpointHitDto.getIp())),
-                hasProperty("timestamp", equalTo(LocalDateTime.parse(endpointHitDto.getTimestamp(),
+                hasProperty("app", equalTo(endpointHit.getApp())),
+                hasProperty("uri", equalTo(endpointHit.getUri())),
+                hasProperty("ip", equalTo(endpointHit.getIp())),
+                hasProperty("timestamp", equalTo(LocalDateTime.parse(endpointHit.getTimestamp(),
                         DateTimeFormatter.ofPattern(DATE_PATTERN))))
         ));
     }
@@ -61,23 +62,23 @@ class StatServiceTest {
 
     final String[] uris = new String[] {"https://ya.ru"};
 
-    final List<ViewStatsDto> viewStatsDtoList = List.of(new ViewStatsDto("appName", uris[0], 1L));
+    final List<ViewStats> viewStatsList = List.of(new ViewStats("appName", uris[0], 1L));
 
     @Test
     void find_withNotUniqueIp_shouldReturnRepositoryFindResult() {
-        when(repository.find(start, end, uris)).thenReturn(viewStatsDtoList);
+        when(repository.find(start, end, uris)).thenReturn(viewStatsList);
 
-        List<ViewStatsDto> result = service.find(start, end, uris, false);
+        List<ViewStats> result = service.find(start, end, uris, false);
 
-        assertThat(viewStatsDtoList == result, is(true));
+        assertThat(viewStatsList == result, is(true));
     }
 
     @Test
     void find_withUniqueIp_shouldReturnRepositoryFindUniqueResult() {
-        when(repository.findUnique(start, end, uris)).thenReturn(viewStatsDtoList);
+        when(repository.findUnique(start, end, uris)).thenReturn(viewStatsList);
 
-        List<ViewStatsDto> result = service.find(start, end, uris, true);
+        List<ViewStats> result = service.find(start, end, uris, true);
 
-        assertThat(viewStatsDtoList == result, is(true));
+        assertThat(viewStatsList == result, is(true));
     }
 }

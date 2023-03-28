@@ -5,8 +5,9 @@ import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.practicum.ewm.stat.dto.EndpointHitDto;
-import ru.practicum.ewm.stat.service.model.EndpointHit;
+import ru.practicum.ewm.stat.dto.EndpointHit;
+import ru.practicum.ewm.stat.service.model.Hit;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -22,13 +23,13 @@ class StatMapperTest {
 
     @Test
     void toEntity_withNotNullFields_shouldReturnEntityWithNotNullFieldsAndNullItem() {
-        EndpointHitDto source = new EndpointHitDto();
+        EndpointHit source = new EndpointHit();
         source.setApp("appName");
         source.setUri("https://ya.ru");
         source.setIp("192.168.0.1");
         source.setTimestamp("2023-03-10 00:00:00");
 
-        EndpointHit target = statMapper.toEntity(source);
+        Hit target = statMapper.toEntity(source);
 
         assertThat(target, allOf(
                 hasProperty("id", is(nullValue())),
@@ -47,9 +48,9 @@ class StatMapperTest {
 
     @Test
     void toEntity_withNullFields_shouldReturnEntityWithNullFields() {
-        EndpointHitDto source = new EndpointHitDto();
+        EndpointHit source = new EndpointHit();
 
-        EndpointHit target = statMapper.toEntity(source);
+        Hit target = statMapper.toEntity(source);
 
         assertThat(target, allOf(
                 hasProperty("id", is(nullValue())),

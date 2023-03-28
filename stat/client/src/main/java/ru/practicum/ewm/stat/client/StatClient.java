@@ -7,41 +7,40 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
-import ru.practicum.ewm.stat.dto.EndpointHitDto;
+import ru.practicum.ewm.stat.dto.EndpointHit;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import static ru.practicum.ewm.common.support.DateFactory.*;
 
 public class StatClient {
     protected final RestTemplate restTemplate;
 
-    private static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
-
-    public StatClient(String serverUrl, RestTemplateBuilder builder) {
-        restTemplate = builder.uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
+    public StatClient(String statServiceUrl, RestTemplateBuilder builder) {
+        restTemplate = builder.uriTemplateHandler(new DefaultUriBuilderFactory(statServiceUrl))
                 .requestFactory(HttpComponentsClientHttpRequestFactory::new)
                 .build();
     }
 
-    public ResponseEntity<String> hit(EndpointHitDto endpointHitDto) {
+    public ResponseEntity<String> hit(EndpointHit endpointHit) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<Object> request = new HttpEntity<>(endpointHitDto, headers);
+        HttpEntity<Object> request = new HttpEntity<>(endpointHit, headers);
 
-        return makeAndSendRequest(HttpMethod.POST, "/hits", request, null);
+        return makeAndSendRequest(HttpMethod.POST, "/hit", request, null);
     }
 
-    public ResponseEntity<String> stats(LocalDateTime start, LocalDateTime end, String[] uris, Boolean unique) {
+    public ResponseEntity<String> stats(@Nullable LocalDateTime start, @Nullable LocalDateTime end, String[] uris,
+                                        @Nullable Boolean unique) {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 
         HttpEntity<Object> request = new HttpEntity<>(null, headers);
 
         QueryParameters queryParameters = new QueryParameters();
-        queryParameters.add("start", start.format(DateTimeFormatter.ofPattern(DATE_PATTERN)));
-        queryParameters.add("end", end.format(DateTimeFormatter.ofPattern(DATE_PATTERN)));
+        queryParameters.add("start", ofDate(start));
+        queryParameters.add("end", ofDate(end));
         queryParameters.add("uris", uris);
         queryParameters.add("unique", unique);
 
@@ -60,23 +59,9 @@ public class StatClient {
                 response = restTemplate.exchange(path, method, request, String.class);
             }
         } catch (HttpStatusCodeException e) {
-            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
+            response = new ResponseEntity<>(e.getResponseBodyAsString(), e.getStatusCode());
         }
 
-        return prepareResponse(response);
-    }
-
-    private ResponseEntity<String> prepareResponse(ResponseEntity<String> response) {
-        if (response.getStatusCode().is2xxSuccessful()) {
-            return response;
-        }
-
-        ResponseEntity.BodyBuilder responseBuilder = ResponseEntity.status(response.getStatusCode());
-
-        if (response.hasBody()) {
-            return responseBuilder.body(response.getBody());
-        }
-
-        return responseBuilder.build();
+        return response;
     }
 }

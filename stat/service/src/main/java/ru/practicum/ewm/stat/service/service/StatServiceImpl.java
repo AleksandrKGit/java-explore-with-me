@@ -4,8 +4,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
-import ru.practicum.ewm.stat.dto.EndpointHitDto;
-import ru.practicum.ewm.stat.dto.ViewStatsDto;
+import ru.practicum.ewm.stat.dto.EndpointHit;
+import ru.practicum.ewm.stat.dto.ViewStats;
 import ru.practicum.ewm.stat.service.StatMapper;
 import ru.practicum.ewm.stat.service.StatRepository;
 import java.time.LocalDateTime;
@@ -20,12 +20,12 @@ public class StatServiceImpl implements StatService {
     StatMapper mapper;
 
     @Override
-    public void create(EndpointHitDto dto) {
+    public void create(EndpointHit dto) {
         repository.saveAndFlush(mapper.toEntity(dto));
     }
 
     @Override
-    public List<ViewStatsDto> find(LocalDateTime start, LocalDateTime end, String[] uris, Boolean unique) {
+    public List<ViewStats> find(LocalDateTime start, LocalDateTime end, String[] uris, Boolean unique) {
         return unique ? repository.findUnique(start, end, uris) : repository.find(start, end, uris);
     }
 }

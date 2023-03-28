@@ -1,12 +1,12 @@
 package ru.practicum.ewm.stat.service.service;
 
-import ru.practicum.ewm.stat.dto.EndpointHitDto;
-import ru.practicum.ewm.stat.dto.ViewStatsDto;
+import ru.practicum.ewm.stat.dto.EndpointHit;
+import ru.practicum.ewm.stat.dto.ViewStats;
 import java.time.LocalDateTime;
 import java.util.List;
 
 public interface StatService {
-    void create(EndpointHitDto dto);
+    void create(EndpointHit dto);
 
-    List<ViewStatsDto> find(LocalDateTime start, LocalDateTime end, String[] uris, Boolean unique);
+    List<ViewStats> find(LocalDateTime start, LocalDateTime end, String[] uris, Boolean unique);
 }
