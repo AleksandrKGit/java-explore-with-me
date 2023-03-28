@@ -17,7 +17,7 @@ class HitTest {
         return nullOtherFields ? HitFactory.createHit(id, null, null, null, null)
                 : HitFactory.createHit(id, "appName", "https://ya.ru", "192.168.0.1", LocalDateTime.now());
     }
-    
+
     @SuppressWarnings("all")
     @Test
     void equals_withSameObjectWithNullIdAndOtherFields_shouldReturnTrue() {
