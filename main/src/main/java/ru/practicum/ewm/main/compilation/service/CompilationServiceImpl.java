@@ -77,7 +77,7 @@ public class CompilationServiceImpl implements CompilationService {
     public List<CompilationDto> find(Boolean pinned, Integer from, Integer size) {
         Pageable pageRequest = OffsetPageRequest.ofOffset(from, size, null);
 
-        List<Long> ids = pinned != null ? repository.find(pinned, pageRequest) : repository.find(pageRequest);
+        List<Long> ids = repository.find(pinned, pageRequest);
 
         if (ids.size() == 0) {
             return List.of();

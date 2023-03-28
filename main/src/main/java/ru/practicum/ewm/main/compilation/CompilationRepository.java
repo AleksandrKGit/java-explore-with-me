@@ -17,9 +17,6 @@ public interface CompilationRepository extends JpaRepository<Compilation, Long> 
             "LEFT JOIN FETCH e.category WHERE c.id IN ?1")
     List<Compilation> get(List<Long> ids);
 
-    @Query("SELECT c.id FROM Compilation c")
-    List<Long> find(Pageable pageable);
-
-    @Query("SELECT c.id FROM Compilation c WHERE c.pinned = ?1")
+    @Query("SELECT c.id FROM Compilation c WHERE ?1 IS NULL OR c.pinned = ?1")
     List<Long> find(Boolean pinned, Pageable pageable);
 }
