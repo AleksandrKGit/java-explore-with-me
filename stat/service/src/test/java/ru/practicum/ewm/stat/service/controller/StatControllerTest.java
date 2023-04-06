@@ -76,9 +76,6 @@ class StatControllerTest {
                                 .content(incorrectJson)
                                 .contentType(MediaType.APPLICATION_JSON)),
 
-                Arguments.of("stats without uris",
-                        get("/stats?start=" + validStart + "&end=" + validEnd)),
-
                 Arguments.of("stats without start",
                         get("/stats?end=" + validEnd + "&uris=" + validUris)),
 

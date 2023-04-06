@@ -4,10 +4,15 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.main.category.Category;
 import ru.practicum.ewm.main.category.CategoryRepository;
+import ru.practicum.ewm.main.comment.repository.CommentRepository;
+import ru.practicum.ewm.main.comment.dto.CommentMapper;
+import ru.practicum.ewm.main.comment.dto.CommentPublicDto;
+import ru.practicum.ewm.main.comment.model.CommentState;
 import ru.practicum.ewm.main.event.repository.EventRepository;
 import ru.practicum.ewm.main.event.controller.EventSort;
 import ru.practicum.ewm.main.event.dto.*;
@@ -30,6 +35,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import static ru.practicum.ewm.common.support.DateFactory.*;
+import static ru.practicum.ewm.main.entity.EntityWithId.sortByIds;
 
 @Service
 @RequiredArgsConstructor
@@ -37,11 +43,15 @@ import static ru.practicum.ewm.common.support.DateFactory.*;
 public class EventServiceImpl implements EventService {
     EventMapper mapper;
 
+    CommentMapper commentMapper;
+
     RequestMapper requestMapper;
 
     EventRepository repository;
 
     CategoryRepository categoryRepository;
+
+    CommentRepository commentRepository;
 
     UserRepository userRepository;
 
@@ -115,11 +125,8 @@ public class EventServiceImpl implements EventService {
 
         List<Event> events = repository.get(ids);
 
-        // Saving query sort
         if (sort.equals(EventSort.EVENT_DATE)) {
-            Map<Long, Event> eventsMap = new TreeMap<>(Long::compareTo);
-            events.forEach(e -> eventsMap.put(e.getId(), e));
-            events = ids.stream().map(eventsMap::get).collect(Collectors.toList());
+            events = sortByIds(events, ids);
         }
 
         return mapper.toShortDto(events, sort.equals(EventSort.VIEWS));
@@ -204,6 +211,10 @@ public class EventServiceImpl implements EventService {
 
         if (event == null) {
             throw new NotFoundException("Event with id = " + id + " was not found");
+        }
+
+        if (dto.getCommentsState() != null && event.getState().equals(EventState.PUBLISHED)) {
+            throw new ForbiddenException("Comments state can not be modified when event is published");
         }
 
         EventState state = null;
@@ -299,5 +310,18 @@ public class EventServiceImpl implements EventService {
         }
 
         return result;
+    }
+
+    @Override
+    public List<CommentPublicDto> findComments(Long eventId, Integer from, Integer size) {
+        Pageable pageRequest = OffsetPageRequest.ofOffset(from, size, Sort.by("createdOn").descending());
+
+        List<Long> ids = commentRepository.findByEventAndState(eventId, CommentState.PUBLISHED, pageRequest);
+
+        if (ids.size() == 0) {
+            return List.of();
+        }
+
+        return commentMapper.toPublicDto(sortByIds(commentRepository.getWithCommentator(ids), ids));
     }
 }

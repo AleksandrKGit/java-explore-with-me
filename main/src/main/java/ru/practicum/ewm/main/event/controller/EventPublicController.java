@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.ewm.main.comment.dto.CommentPublicDto;
 import ru.practicum.ewm.main.event.dto.EventFullDto;
 import ru.practicum.ewm.main.event.dto.EventShortDto;
 import ru.practicum.ewm.main.event.service.EventService;
@@ -41,6 +42,19 @@ public class EventPublicController {
                                                     HttpServletRequest request) {
         List<EventShortDto> dtoList = service.find(request.getRemoteAddr(), request.getRequestURI(), text, categories,
                 paid, dateOf(rangeStart), dateOf(rangeEnd), onlyAvailable, EventSort.valueOf(sort), from, size);
+
+        return ResponseEntity.ok(dtoList);
+    }
+
+    @GetMapping("/{eventId}/comments")
+    public ResponseEntity<List<CommentPublicDto>> findComments(@PathVariable Long eventId,
+                                                               @Min(value = 0, message = "must not be less than 0")
+                                                               @RequestParam(required = false, defaultValue = "0")
+                                                               Integer from,
+                                                               @Min(value = 1, message = "must not be less than 1")
+                                                               @RequestParam(required = false, defaultValue = "10")
+                                                               Integer size) {
+        List<CommentPublicDto> dtoList = service.findComments(eventId, from, size);
 
         return ResponseEntity.ok(dtoList);
     }

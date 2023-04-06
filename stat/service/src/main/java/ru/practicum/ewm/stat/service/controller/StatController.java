@@ -28,7 +28,7 @@ public class StatController {
     @GetMapping("/stats")
     public ResponseEntity<List<ViewStats>> find(@RequestParam String start,
                                                 @RequestParam String end,
-                                                @RequestParam String[] uris,
+                                                @RequestParam(required = false) String[] uris,
                                                 @RequestParam(defaultValue = "false") Boolean unique) {
         List<ViewStats> listDto = service.find(dateOf(start), dateOf(end), uris, unique);
 

@@ -66,7 +66,7 @@ class StatServiceTest {
 
     @Test
     void find_withNotUniqueIp_shouldReturnRepositoryFindResult() {
-        when(repository.find(start, end, uris)).thenReturn(viewStatsList);
+        when(repository.findWithUris(start, end, uris)).thenReturn(viewStatsList);
 
         List<ViewStats> result = service.find(start, end, uris, false);
 
@@ -75,7 +75,7 @@ class StatServiceTest {
 
     @Test
     void find_withUniqueIp_shouldReturnRepositoryFindUniqueResult() {
-        when(repository.findUnique(start, end, uris)).thenReturn(viewStatsList);
+        when(repository.findUniqueWithUris(start, end, uris)).thenReturn(viewStatsList);
 
         List<ViewStats> result = service.find(start, end, uris, true);
 

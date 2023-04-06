@@ -1,6 +1,6 @@
 package ru.practicum.ewm.main.validation.constraints;
 
-import ru.practicum.ewm.main.validation.validators.DateOfPatternValidator;
+import ru.practicum.ewm.main.validation.validators.CommentStateValidator;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import java.lang.annotation.Documented;
@@ -9,14 +9,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-@Target({ElementType.FIELD, ElementType.PARAMETER})
+@Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.TYPE_USE})
 @Retention(RUNTIME)
-@Constraint(validatedBy = DateOfPatternValidator.class)
+@Constraint(validatedBy = CommentStateValidator.class)
 @Documented
-public @interface DateOfPattern {
-    String pattern();
-
-    String message() default "incorrect data pattern";
+public @interface CommentState {
+    String message() default "mast be one of allowed";
 
     Class<?>[] groups() default {};
 

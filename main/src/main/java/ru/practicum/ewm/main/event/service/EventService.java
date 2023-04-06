@@ -1,5 +1,6 @@
 package ru.practicum.ewm.main.event.service;
 
+import ru.practicum.ewm.main.comment.dto.CommentPublicDto;
 import ru.practicum.ewm.main.event.controller.EventSort;
 import ru.practicum.ewm.main.event.dto.*;
 import ru.practicum.ewm.main.request.dto.ParticipationRequestDto;
@@ -28,5 +29,8 @@ public interface EventService {
 
     List<ParticipationRequestDto> findRequestsByInitiator(Long userId, Long eventId);
 
-    EventRequestStatusUpdateResult updateRequestsByInitiator(Long userId, Long eventId, EventRequestStatusUpdateRequest dto);
+    EventRequestStatusUpdateResult updateRequestsByInitiator(Long userId, Long eventId,
+                                                             EventRequestStatusUpdateRequest dto);
+
+    List<CommentPublicDto> findComments(Long eventId, Integer from, Integer size);
 }

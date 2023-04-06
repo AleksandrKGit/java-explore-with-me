@@ -11,8 +11,9 @@
 
     <name>Common</name>
 
-    <groupId>ru.practicum.ewm.common</groupId>
+    <groupId>ru.practicum.ewm</groupId>
     <artifactId>common</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
 
     <dependencies>
         <dependency>

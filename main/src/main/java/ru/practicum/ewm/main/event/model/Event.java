@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.ewm.main.category.Category;
 import ru.practicum.ewm.main.compilation.Compilation;
+import ru.practicum.ewm.main.entity.EntityWithId;
 import ru.practicum.ewm.main.user.User;
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -17,7 +18,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Event {
+public class Event implements EntityWithId {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
@@ -72,6 +73,13 @@ public class Event {
 
     @ManyToMany(mappedBy = "events", fetch = FetchType.LAZY)
     List<Compilation> compilations;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    EventCommentsState commentsState = EventCommentsState.PUBLIC;
+
+    @Column(nullable = false)
+    Long publishedComments = 0L;
 
     @Override
     public boolean equals(Object obj) {

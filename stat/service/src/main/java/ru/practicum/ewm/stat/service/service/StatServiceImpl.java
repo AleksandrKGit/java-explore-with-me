@@ -26,6 +26,10 @@ public class StatServiceImpl implements StatService {
 
     @Override
     public List<ViewStats> find(LocalDateTime start, LocalDateTime end, String[] uris, Boolean unique) {
-        return unique ? repository.findUnique(start, end, uris) : repository.find(start, end, uris);
+        if (uris == null) {
+            return unique ? repository.findUnique(start, end) : repository.find(start, end);
+        }
+
+        return unique ? repository.findUniqueWithUris(start, end, uris) : repository.findWithUris(start, end, uris);
     }
 }
