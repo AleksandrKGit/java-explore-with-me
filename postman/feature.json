@@ -13151,23 +13151,21 @@
 		},
 		{
 			"key": "requestBody",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
 			"key": "userId",
-			"value": "1",
-			"type": "string"
+			"value": 0,
+			"type": "number"
 		},
 		{
 			"key": "eventId",
-			"value": "1",
-			"type": "string"
+			"value": 0,
+			"type": "number"
 		},
 		{
 			"key": "response",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
 			"key": "commentsState",
@@ -13176,28 +13174,25 @@
 		},
 		{
 			"key": "currentDate",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
 			"key": "event",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
 			"key": "commentId",
-			"value": "",
-			"type": "string"
+			"value": 0,
+			"type": "number"
 		},
 		{
 			"key": "comments",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
 			"key": "compId",
-			"value": "",
-			"type": "string"
+			"value": 0,
+			"type": "number"
 		}
 	]
 }
