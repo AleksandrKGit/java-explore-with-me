@@ -127,9 +127,10 @@ public class StatControllerIntegrationTests {
         em.persist(hitApp1Uri1Ip3);
         em.flush();
 
-        mockMvc.perform(get("/stats?start=" + start.format(DateTimeFormatter.ofPattern(DATE_PATTERN))
-                        + "&end=" + end.format(DateTimeFormatter.ofPattern(DATE_PATTERN))
-                        + "&uris=" + String.join(",", uris) + "&unique=true"))
+        mockMvc.perform(get(String.format("/stats?start=%s&end=%s&uris=%s&unique=true",
+                        start.format(DateTimeFormatter.ofPattern(DATE_PATTERN)),
+                        end.format(DateTimeFormatter.ofPattern(DATE_PATTERN)),
+                        String.join(",", uris))))
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$[0].app", equalTo(app1)),

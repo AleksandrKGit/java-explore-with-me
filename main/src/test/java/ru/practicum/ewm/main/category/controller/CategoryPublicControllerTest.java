@@ -116,7 +116,7 @@ class CategoryPublicControllerTest {
 
         when(service.find(from, size)).thenReturn(resultListDto);
 
-        mockMvc.perform(get("/categories?from=" + from + "&size=" + size))
+        mockMvc.perform(get(String.format("/categories?from=%s&size=%s", from, size)))
                 .andExpect(content().json(objectMapper.writeValueAsString(resultListDto)))
                 .andExpect(status().isOk());
     }
@@ -134,7 +134,7 @@ class CategoryPublicControllerTest {
     @Test
     void request_withReadByIdEndPointAndNotFoundExceptionThrownByServiceDeleteMethod_shouldReturnStatusNotFoundAndApiError()
             throws Exception {
-        String message = "Category with id=" + validId + " was not found";
+        String message = String.format("Category with id = %s was not found", validId);
         NotFoundException exception = new NotFoundException(message);
 
         when(service.get(validId)).thenThrow(exception);

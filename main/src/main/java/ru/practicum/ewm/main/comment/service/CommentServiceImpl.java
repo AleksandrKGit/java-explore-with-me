@@ -45,26 +45,26 @@ public class CommentServiceImpl implements CommentService {
         Event event = eventRepository.findById(eventId).orElse(null);
 
         if (event == null) {
-            throw new NotFoundException("Event with id = " + eventId + " was not found");
+            throw new NotFoundException(String.format("Event with id = %s was not found", eventId));
         }
 
         User commentator = userRepository.findById(userId).orElse(null);
 
         if (commentator == null) {
-            throw new NotFoundException("User with id = " + userId + " was not found");
+            throw new NotFoundException(String.format("User with id = %s was not found", userId));
         }
 
-        if (!event.getState().equals(EventState.PUBLISHED)) {
-            throw new ConflictException("Event with id = " + eventId + " was not published");
+        if (!EventState.PUBLISHED.equals(event.getState())) {
+            throw new ConflictException(String.format("Event with id = %s was not published", eventId));
         }
 
-        if (event.getCommentsState().equals(EventCommentsState.NOT_ALLOWED)
+        if (EventCommentsState.NOT_ALLOWED.equals(event.getCommentsState())
                 && !event.getInitiator().getId().equals(userId)) {
-            throw new ConflictException("Comments to event with id = " + eventId + " are not allowed");
+            throw new ConflictException(String.format("Comments to event with id = %s are not allowed", eventId));
         }
 
         boolean doPublish = event.getInitiator().getId().equals(userId) ||
-                event.getCommentsState().equals(EventCommentsState.PUBLIC);
+                EventCommentsState.PUBLIC.equals(event.getCommentsState());
 
         Comment comment = mapper.toEntity(dto, commentator, event, LocalDateTime.now(),
                 doPublish ? CommentState.PUBLISHED : CommentState.PENDING);
@@ -114,21 +114,21 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = repository.getByCommentator(id, userId).orElse(null);
 
         if (comment == null) {
-            throw new NotFoundException("Comment with id = " + id + " was not found");
+            throw new NotFoundException(String.format("Comment with id = %s was not found", id));
         }
 
         comment.setText(dto.getText());
 
         if (!comment.getEvent().getInitiator().getId().equals(userId)) {
-            if (comment.getState().equals(CommentState.PUBLISHED)
-                    && comment.getEvent().getCommentsState().equals(EventCommentsState.MODERATED)) {
+            if (CommentState.PUBLISHED.equals(comment.getState())
+                    && EventCommentsState.MODERATED.equals(comment.getEvent().getCommentsState())) {
                 comment.setState(CommentState.PENDING);
                 eventRepository.decreasePublishedComments(comment.getEvent().getId(), 1L);
-            } else if (comment.getState().equals(CommentState.REJECTED)
-                    && comment.getEvent().getCommentsState().equals(EventCommentsState.MODERATED)) {
+            } else if (CommentState.REJECTED.equals(comment.getState())
+                    && EventCommentsState.MODERATED.equals(comment.getEvent().getCommentsState())) {
                 comment.setState(CommentState.PENDING);
-            } else if (comment.getState().equals(CommentState.REJECTED)
-                    && comment.getEvent().getCommentsState().equals(EventCommentsState.PUBLIC)) {
+            } else if (CommentState.REJECTED.equals(comment.getState())
+                    && EventCommentsState.PUBLIC.equals(comment.getEvent().getCommentsState())) {
                 comment.setState(CommentState.PUBLISHED);
                 eventRepository.increasePublishedComments(comment.getEvent().getId(), 1L);
             }
@@ -151,7 +151,7 @@ public class CommentServiceImpl implements CommentService {
 
         Map<Long, Long> decreaseCount = new TreeMap<>(Long::compareTo);
         comments.forEach(comment -> {
-            if (comment.getState().equals(CommentState.PUBLISHED)) {
+            if (CommentState.PUBLISHED.equals(comment.getState())) {
                 decreaseCount.put(comment.getEvent().getId(),
                         decreaseCount.getOrDefault(comment.getEvent().getId(), 0L) + 1L);
             }
@@ -192,18 +192,6 @@ public class CommentServiceImpl implements CommentService {
         return mapper.toFullDto(comments);
     }
 
-    private void delete(Long id, Comment comment) {
-        if (comment == null) {
-            throw new NotFoundException("Comment with id = " + id + " was not found");
-        }
-
-        if (comment.getState().equals(CommentState.PUBLISHED)) {
-            eventRepository.decreasePublishedComments(comment.getEvent().getId(), 1L);
-        }
-
-        repository.delete(comment);
-    }
-
     @Transactional
     @Override
     public void deleteByCommentator(Long userId, Long id) {
@@ -214,5 +202,17 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void delete(Long id) {
         delete(id, repository.findById(id).orElse(null));
+    }
+
+    private void delete(Long id, Comment comment) {
+        if (comment == null) {
+            throw new NotFoundException(String.format("Comment with id = %s was not found", id));
+        }
+
+        if (CommentState.PUBLISHED.equals(comment.getState())) {
+            eventRepository.decreasePublishedComments(comment.getEvent().getId(), 1L);
+        }
+
+        repository.delete(comment);
     }
 }

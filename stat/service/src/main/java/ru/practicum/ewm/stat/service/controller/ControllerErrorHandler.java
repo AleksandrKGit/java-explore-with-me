@@ -13,10 +13,6 @@ import java.time.format.DateTimeParseException;
 
 @ControllerAdvice
 public class ControllerErrorHandler {
-    private ResponseEntity<ApiError> getResponseEntity(HttpStatus status, Exception ex, String reason) {
-        return new ResponseEntity<>(new ApiError(status, reason, ex), status);
-    }
-
     @ExceptionHandler
     public ResponseEntity<ApiError> handleException(Exception ex) {
         return getResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, ex, "Stat service error.");
@@ -27,5 +23,9 @@ public class ControllerErrorHandler {
             HttpMediaTypeNotSupportedException.class})
     public ResponseEntity<ApiError> handleBadRequestException(Exception ex) {
         return getResponseEntity(HttpStatus.BAD_REQUEST, ex, "Incorrectly made request.");
+    }
+
+    private ResponseEntity<ApiError> getResponseEntity(HttpStatus status, Exception ex, String reason) {
+        return new ResponseEntity<>(new ApiError(status, reason, ex), status);
     }
 }

@@ -111,7 +111,7 @@ public class CategoryAdminControllerIntegrationTests {
     @Test
     void update_withNotExistingId_shouldReturnStatusNotFound() throws Exception {
         long notExistingId = 1000L;
-        String message = "Category with id=" + notExistingId + " was not found";
+        String message = String.format("Category with id = %s was not found", notExistingId);
 
         mockMvc.perform(patch("/admin/categories/" + notExistingId)
                         .content(objectMapper.writeValueAsString(requestUpdateCategoryDto))
@@ -166,7 +166,7 @@ public class CategoryAdminControllerIntegrationTests {
     @Test
     void delete_withNotExistingId_shouldReturnStatusNotFound() throws Exception {
         long notExistingId = 1000L;
-        String message = "Category with id = " + notExistingId + " was not found";
+        String message = String.format("Category with id = %s was not found", notExistingId);
 
         mockMvc.perform(delete("/admin/categories/" + notExistingId))
                 .andExpectAll(

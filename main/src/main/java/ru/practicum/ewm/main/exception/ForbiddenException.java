@@ -6,6 +6,6 @@ public class ForbiddenException extends RuntimeException {
     }
 
     public ForbiddenException(String field, String error, String value) {
-        super("Field: " + field + ". Error: " + error + ". Value: " + value);
+        super(String.format("Field: %s. Error: %s. Value: %s", field, error, value));
     }
 }

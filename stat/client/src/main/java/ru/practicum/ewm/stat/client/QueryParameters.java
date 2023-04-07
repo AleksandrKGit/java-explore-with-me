@@ -32,7 +32,7 @@ public class QueryParameters {
 
         if (value != null) {
             parameters.put(name, value);
-            query = (query.isEmpty() ? "" : query + "&") + name + "={" + name + "}";
+            query = (query.isEmpty() ? "" : query + "&") + String.format("%s={%s}", name, name);
         }
     }
 }

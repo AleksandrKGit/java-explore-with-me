@@ -136,7 +136,7 @@ class StatControllerTest {
         when(service.find(eq(start), eq(end), urisArgumentCaptor.capture(), eq(false)))
                 .thenThrow(exception);
 
-        mockMvc.perform(get("/stats?start=" + validStart + "&end=" + validEnd + "&uris=" + validUris))
+        mockMvc.perform(get(String.format("/stats?start=%s&end=%s&uris=%s", validStart, validEnd, validUris)))
                 .andExpectAll(
                         status().isInternalServerError(),
                         jsonPath("$.status", is(HttpStatus.INTERNAL_SERVER_ERROR.name())),
@@ -159,7 +159,7 @@ class StatControllerTest {
         when(service.find(eq(start), eq(end), urisArgumentCaptor.capture(), eq(false)))
                 .thenReturn(viewStatsList);
 
-        mockMvc.perform(get("/stats?start=" + validStart + "&end=" + validEnd + "&uris=" + validUris))
+        mockMvc.perform(get(String.format("/stats?start=%s&end=%s&uris=%s", validStart, validEnd, validUris)))
                 .andExpect(content().json(objectMapper.writeValueAsString(viewStatsList)))
                 .andExpect(status().isOk());
 

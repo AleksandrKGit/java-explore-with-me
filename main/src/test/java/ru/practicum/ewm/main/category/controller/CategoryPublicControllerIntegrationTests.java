@@ -69,7 +69,7 @@ public class CategoryPublicControllerIntegrationTests {
         int from = 1;
         int size = 2;
 
-        mockMvc.perform(get("/categories?from=" + from + "&size=" + size))
+        mockMvc.perform(get(String.format("/categories?from=%s&size=%s", from, size)))
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$[0].id", is(category2.getId()), Long.class),
@@ -89,7 +89,7 @@ public class CategoryPublicControllerIntegrationTests {
     @Test
     void readById_withNotExistingId_shouldReturnStatusNotFound() throws Exception {
         long notExistingId = 1000L;
-        String message = "Category with id=" + notExistingId + " was not found";
+        String message = String.format("Category with id = %s was not found", notExistingId);
 
         mockMvc.perform(get("/categories/" + notExistingId))
                 .andExpectAll(

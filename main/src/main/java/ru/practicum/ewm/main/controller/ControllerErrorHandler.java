@@ -24,10 +24,6 @@ import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class ControllerErrorHandler {
-    private ResponseEntity<ApiError> getResponseEntity(HttpStatus status, Exception ex, String reason) {
-        return new ResponseEntity<>(new ApiError(status, reason, ex), status);
-    }
-
     @ExceptionHandler
     public ResponseEntity<ApiError> handleException(Exception ex) {
         return getResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, ex, "Main service error.");
@@ -82,14 +78,17 @@ public class ControllerErrorHandler {
         return handleValidationError(getFieldsErrors(ex));
     }
 
+    private ResponseEntity<ApiError> getResponseEntity(HttpStatus status, Exception ex, String reason) {
+        return new ResponseEntity<>(new ApiError(status, reason, ex), status);
+    }
+
     private ResponseEntity<ApiError> handleValidationError(Map<String, FieldValidationErrors> fieldsErrors) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
 
         List<String> errors = fieldsErrors.entrySet()
                 .stream()
-                .map(e -> "Field: " + e.getKey() + ". "
-                        + "Error: " + String.join("; ", e.getValue().getErrors()) + ". "
-                        + "Value: " + e.getValue().getRejectedValue())
+                .map(e -> String.format("Field: %s. Error: %s. Value: %s", e.getKey(),
+                        String.join("; ", e.getValue().getErrors()), e.getValue().getRejectedValue()))
                 .collect(Collectors.toList());
 
         return new ResponseEntity<>(new ApiError(status, "Incorrectly made request.", errors), status);

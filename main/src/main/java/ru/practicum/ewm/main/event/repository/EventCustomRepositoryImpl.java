@@ -26,7 +26,7 @@ public class EventCustomRepositoryImpl implements EventCustomRepository {
         CriteriaQuery<Long> query = cb.createQuery(Long.class);
         Root<Event> events = query.from(Event.class);
 
-        if (sort.equals(EventSort.EVENT_DATE)) {
+        if (EventSort.EVENT_DATE.equals(sort)) {
             query.orderBy(cb.desc(events.get("eventDate")));
         }
 

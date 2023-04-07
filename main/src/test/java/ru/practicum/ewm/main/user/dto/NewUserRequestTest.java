@@ -87,8 +87,8 @@ class NewUserRequestTest {
 
     @Test
     void fromJson_withNotEmptyFields_shouldReturnDtoWithNotEmptyFields() throws JsonProcessingException {
-        NewUserRequest target = objectMapper.readValue("{\"name\":\"" + validName + "\", "
-                + "\"email\":\"" + validEmail + "\"}", NewUserRequest.class);
+        NewUserRequest target = objectMapper.readValue(String.format("{\"name\":\"%s\", \"email\":\"%s\"}", validName,
+                validEmail), NewUserRequest.class);
 
         assertThat(target, allOf(
                 hasProperty("name", equalTo(validName)),

@@ -36,7 +36,7 @@ public class CategoryServiceImpl implements CategoryService {
         Category entity = repository.findById(id).orElse(null);
 
         if (entity == null) {
-            throw new NotFoundException("Category with id=" + id + " was not found");
+            throw new NotFoundException(String.format("Category with id = %s was not found", id));
         }
 
         return mapper.toDto(entity);
@@ -54,7 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
         Category entity = repository.findById(id).orElse(null);
 
         if (entity == null) {
-            throw new NotFoundException("Category with id=" + id + " was not found");
+            throw new NotFoundException(String.format("Category with id = %s was not found", id));
         }
 
         mapper.updateEntityFromDto(dto, entity);
@@ -69,7 +69,7 @@ public class CategoryServiceImpl implements CategoryService {
         } catch (DataIntegrityViolationException ignored) {
             throw new ConflictException("The category is not empty");
         } catch (EmptyResultDataAccessException ignored) {
-            throw new NotFoundException("Category with id = " + id + " was not found");
+            throw new NotFoundException(String.format("Category with id = %s was not found", id));
         }
     }
 }

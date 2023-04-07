@@ -20,8 +20,9 @@ class EndpointHitTest {
         String validUri = "https://ya.ru";
         String validIp = "192.169.0.1";
         String validTimestamp = "2023-03-01 00:00:00";
-        EndpointHit target = objectMapper.readValue("{\"app\":\"" + validApp + "\", \"uri\":\"" + validUri
-                + "\", \"ip\":\"" + validIp + "\", \"timestamp\":\"" + validTimestamp + "\"}", EndpointHit.class);
+        EndpointHit target = objectMapper.readValue(
+                String.format("{\"app\":\"%s\", \"uri\":\"%s\", \"ip\":\"%s\", \"timestamp\":\"%s\"}",
+                        validApp, validUri, validIp, validTimestamp), EndpointHit.class);
 
         assertThat(target, allOf(
                 hasProperty("app", equalTo(validApp)),

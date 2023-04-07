@@ -13,11 +13,6 @@ import static org.hamcrest.Matchers.equalTo;
 class HitTest {
     private final Long id = 1L;
 
-    private Hit createHit(Long id, boolean nullOtherFields) {
-        return nullOtherFields ? HitFactory.createHit(id, null, null, null, null)
-                : HitFactory.createHit(id, "appName", "https://ya.ru", "192.168.0.1", LocalDateTime.now());
-    }
-
     @SuppressWarnings("all")
     @Test
     void equals_withSameObjectWithNullIdAndOtherFields_shouldReturnTrue() {
@@ -85,6 +80,11 @@ class HitTest {
         Hit hit2 = createHit(2L, false);
 
         assertThat(hit1.hashCode(), not(equalTo(hit2.hashCode())));
+    }
+
+    private Hit createHit(Long id, boolean nullOtherFields) {
+        return nullOtherFields ? HitFactory.createHit(id, null, null, null, null)
+                : HitFactory.createHit(id, "appName", "https://ya.ru", "192.168.0.1", LocalDateTime.now());
     }
 
     @SuppressWarnings("all")

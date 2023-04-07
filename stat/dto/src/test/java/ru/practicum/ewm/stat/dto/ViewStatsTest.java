@@ -16,8 +16,8 @@ class ViewStatsTest {
         String validApp = "itemApp";
         String validUri = "https://ya.ru";
         Long validHits = 5L;
-        ViewStats target = objectMapper.readValue("{\"app\":\"" + validApp + "\", \"uri\":\"" + validUri
-                + "\", \"hits\":" + validHits + "}", ViewStats.class);
+        ViewStats target = objectMapper.readValue(String.format("{\"app\":\"%s\", \"uri\":\"%s\", \"hits\":%s}",
+                validApp, validUri, validHits), ViewStats.class);
 
         assertThat(target, allOf(
                 hasProperty("app", equalTo(validApp)),

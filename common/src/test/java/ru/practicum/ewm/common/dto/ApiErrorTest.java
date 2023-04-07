@@ -76,8 +76,8 @@ class ApiErrorTest {
         LocalDateTime timestamp = LocalDateTime.now();
         source.setTimestamp(timestamp);
         source.setErrors(errors);
-        String expected = "{\"errors\":[\"error1\", \"error2\"], \"status\":\"OK\", \"reason\":\"reason\", " +
-                "\"message\":\"" + message + "\", \"timestamp\":\"" + ofDate(timestamp) + "\"}";
+        String expected = String.format("{\"errors\":[\"error1\", \"error2\"], \"status\":\"OK\", \"reason\":"
+                + "\"reason\", \"message\":\"%s\", \"timestamp\":\"%s\"}", message, ofDate(timestamp));
 
         String actual = objectMapper.writeValueAsString(source);
 

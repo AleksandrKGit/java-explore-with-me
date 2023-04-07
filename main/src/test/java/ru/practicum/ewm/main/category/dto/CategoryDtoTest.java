@@ -65,8 +65,8 @@ class CategoryDtoTest {
 
     @Test
     void fromJson_withNotEmptyFields_shouldReturnDtoWithNotEmptyFields() throws JsonProcessingException {
-        CategoryDto target = objectMapper.readValue("{\"name\":\"" + validName + "\", "
-                + "\"id\":" + validId + "}", CategoryDto.class);
+        CategoryDto target = objectMapper.readValue(String.format("{\"name\":\"%s\", \"id\":%s}", validName,
+                validId), CategoryDto.class);
 
         assertThat(target, allOf(
                 hasProperty("name", equalTo(validName)),

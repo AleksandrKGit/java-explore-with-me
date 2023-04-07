@@ -19,11 +19,6 @@ import static org.hamcrest.Matchers.equalTo;
 public class EntitiesTest {
     private final Long id = 1L;
 
-    @FunctionalInterface
-    private interface EntityFactory {
-        Object create(Long id, boolean nullOtherFields);
-    }
-
     private static Stream<Arguments> getFactory() {
         return Stream.of(
                 Arguments.of("User", (EntityFactory) (id, nullOtherFields) -> nullOtherFields
@@ -105,20 +100,6 @@ public class EntitiesTest {
         assertThat(entity1.equals(entity2), is(true));
     }
 
-    private static Stream<Arguments> withFactory(Stream<Arguments> argsStream) {
-        return argsStream.flatMap(
-                args1 -> getFactory().map(
-                        args2 -> {
-                            List<Object> args = new LinkedList<>(Arrays.asList(args1.get()));
-
-                            args.set(0, args2.get()[0].toString() + args.get(0).toString());
-                            args.add(1, args2.get()[1]);
-
-                            return Arguments.of(args.toArray());
-                        }
-                ));
-    }
-
     private static Stream<Arguments> equalFactory() {
         return withFactory(Stream.of(
                 Arguments.of(": objects with null ids", null),
@@ -160,5 +141,24 @@ public class EntitiesTest {
         Object entity2 = factory.create(id2, false);
 
         assertThat(entity1.hashCode(), not(equalTo(entity2.hashCode())));
+    }
+
+    @FunctionalInterface
+    private interface EntityFactory {
+        Object create(Long id, boolean nullOtherFields);
+    }
+
+    private static Stream<Arguments> withFactory(Stream<Arguments> argsStream) {
+        return argsStream.flatMap(
+                args1 -> getFactory().map(
+                        args2 -> {
+                            List<Object> args = new LinkedList<>(Arrays.asList(args1.get()));
+
+                            args.set(0, args2.get()[0].toString() + args.get(0).toString());
+                            args.add(1, args2.get()[1]);
+
+                            return Arguments.of(args.toArray());
+                        }
+                ));
     }
 }

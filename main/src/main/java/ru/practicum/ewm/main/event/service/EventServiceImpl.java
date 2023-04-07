@@ -59,13 +59,6 @@ public class EventServiceImpl implements EventService {
 
     StatService statService;
 
-    private void checkEventDate(LocalDateTime eventDate, Integer hours) {
-        if (eventDate.isBefore(now().plusHours(hours))) {
-            throw new ForbiddenException("eventDate", "Must not be earlier than " + hours + " h. after now",
-                    ofDate(eventDate));
-        }
-    }
-
     @Override
     public EventFullDto create(Long userId, NewEventDto dto) {
         checkEventDate(dateOf(dto.getEventDate()), 2);
@@ -73,13 +66,13 @@ public class EventServiceImpl implements EventService {
         User initiator = userRepository.findById(userId).orElse(null);
 
         if (initiator == null) {
-            throw new NotFoundException("User with id = " + userId + " was not found");
+            throw new NotFoundException(String.format("User with id = %s was not found", userId));
         }
 
         Category category = categoryRepository.findById(dto.getCategory()).orElse(null);
 
         if (category == null) {
-            throw new NotFoundException("Category with id = " + dto.getCategory() + " was not found");
+            throw new NotFoundException(String.format("Category with id = %s was not found", dto.getCategory()));
         }
 
         Event event = mapper.toEntity(dto, initiator, category, now(), EventState.PENDING);
@@ -92,7 +85,7 @@ public class EventServiceImpl implements EventService {
         Event event = repository.getByState(id, EventState.PUBLISHED).orElse(null);
 
         if (event == null) {
-            throw new NotFoundException("Event with id = " + id + " was not found");
+            throw new NotFoundException(String.format("Event with id = %s was not found", id));
         }
 
         statService.addEventEndPoint(ip, id);
@@ -105,7 +98,7 @@ public class EventServiceImpl implements EventService {
         Event event = repository.get(id).orElse(null);
 
         if (event == null || !Objects.equals(userId, event.getInitiator().getId())) {
-            throw new NotFoundException("Event with id=" + id + " was not found");
+            throw new NotFoundException(String.format("Event with id = %s was not found", id));
         }
 
         return mapper.toFullDto(event);
@@ -125,11 +118,11 @@ public class EventServiceImpl implements EventService {
 
         List<Event> events = repository.get(ids);
 
-        if (sort.equals(EventSort.EVENT_DATE)) {
+        if (EventSort.EVENT_DATE.equals(sort)) {
             events = sortByIds(events, ids);
         }
 
-        return mapper.toShortDto(events, sort.equals(EventSort.VIEWS));
+        return mapper.toShortDto(events, EventSort.VIEWS.equals(sort));
     }
 
     @Override
@@ -158,18 +151,6 @@ public class EventServiceImpl implements EventService {
         return mapper.toFullDto(repository.get(ids), false);
     }
 
-    private void updateCategory(Event event, Long categoryId) {
-        if (categoryId != null) {
-            Category category = categoryRepository.findById(categoryId).orElse(null);
-
-            if (category == null) {
-                throw new NotFoundException("Category with id = " + categoryId + " was not found");
-            }
-
-            event.setCategory(category);
-        }
-    }
-
     @Override
     public EventFullDto updateByInitiator(Long userId, Long id, UpdateEventUserRequest dto) {
         if (dto.getEventDate() != null) {
@@ -179,21 +160,21 @@ public class EventServiceImpl implements EventService {
         Event event = repository.get(id).orElse(null);
 
         if (event == null || !Objects.equals(userId, event.getInitiator().getId())) {
-            throw new NotFoundException("Event with id = " + id + " was not found");
+            throw new NotFoundException(String.format("Event with id = %s was not found", id));
         }
 
         if (dto.getEventDate() == null) {
             checkEventDate(event.getEventDate(), 2);
         }
 
-        if (!event.getState().equals(EventState.PENDING) && !event.getState().equals(EventState.CANCELED)) {
+        if (!EventState.PENDING.equals(event.getState()) && !EventState.CANCELED.equals(event.getState())) {
             throw new ForbiddenException("Only pending or canceled events can be changed");
         }
 
         updateCategory(event, dto.getCategory());
 
         EventState state = dto.getStateAction() == null ? null :
-                (EventUserStateAction.valueOf(dto.getStateAction()).equals(EventUserStateAction.CANCEL_REVIEW) ?
+                (EventUserStateAction.CANCEL_REVIEW.name().equals(dto.getStateAction()) ?
                         EventState.CANCELED : EventState.PENDING);
 
         mapper.updateFromUser(dto, event, state);
@@ -210,10 +191,10 @@ public class EventServiceImpl implements EventService {
         Event event = repository.get(id).orElse(null);
 
         if (event == null) {
-            throw new NotFoundException("Event with id = " + id + " was not found");
+            throw new NotFoundException(String.format("Event with id = %s was not found", id));
         }
 
-        if (dto.getCommentsState() != null && event.getState().equals(EventState.PUBLISHED)) {
+        if (dto.getCommentsState() != null && EventState.PUBLISHED.equals(event.getState())) {
             throw new ForbiddenException("Comments state can not be modified when event is published");
         }
 
@@ -221,13 +202,13 @@ public class EventServiceImpl implements EventService {
         LocalDateTime publishedOn = null;
 
         if (dto.getStateAction() != null) {
-            boolean doPublish = dto.getStateAction().equals(EventAdminStateAction.PUBLISH_EVENT.toString());
+            boolean doPublish = EventAdminStateAction.PUBLISH_EVENT.name().equals(dto.getStateAction());
 
-            if (doPublish && !event.getState().equals(EventState.PENDING)) {
+            if (doPublish && !EventState.PENDING.equals(event.getState())) {
                 throw new ForbiddenException("Only pending events can be published");
             }
 
-            if (!doPublish && event.getState().equals(EventState.PUBLISHED)) {
+            if (!doPublish && EventState.PUBLISHED.equals(event.getState())) {
                 throw new ForbiddenException("Event already published");
             }
 
@@ -263,10 +244,10 @@ public class EventServiceImpl implements EventService {
         Event event = repository.findById(eventId).orElse(null);
 
         if (event == null || !Objects.equals(userId, event.getInitiator().getId())) {
-            throw new NotFoundException("Event with id = " + eventId + " was not found");
+            throw new NotFoundException(String.format("Event with id = %s was not found", eventId));
         }
 
-        if (!event.getState().equals(EventState.PUBLISHED)) {
+        if (!EventState.PUBLISHED.equals(event.getState())) {
             throw new BadRequestException("Event must be published");
         }
 
@@ -274,10 +255,10 @@ public class EventServiceImpl implements EventService {
             throw new ConflictException("Event does not need request moderation");
         }
 
-        RequestStatus status = dto.getStatus().equals(RequestUpdateStatusAction.CONFIRMED.toString()) ?
+        RequestStatus status = RequestUpdateStatusAction.CONFIRMED.name().equals(dto.getStatus()) ?
                 RequestStatus.CONFIRMED : RequestStatus.REJECTED;
 
-        if (status.equals(RequestStatus.CONFIRMED) && event.getParticipantLimit() != 0
+        if (RequestStatus.CONFIRMED.equals(status) && event.getParticipantLimit() != 0
                 && ((event.getConfirmedRequests() + dto.getRequestIds().size()) > event.getParticipantLimit())) {
             throw new ConflictException("The participant limit has been reached");
         }
@@ -290,7 +271,7 @@ public class EventServiceImpl implements EventService {
         }
 
         requests.forEach(request -> {
-            if (!request.getStatus().equals(RequestStatus.PENDING)) {
+            if (!RequestStatus.PENDING.equals(request.getStatus())) {
                 throw new ConflictException("Requests must have status PENDING");
             }
 
@@ -301,7 +282,7 @@ public class EventServiceImpl implements EventService {
 
         EventRequestStatusUpdateResult result = new EventRequestStatusUpdateResult();
 
-        if (status.equals(RequestStatus.CONFIRMED)) {
+        if (RequestStatus.CONFIRMED.equals(status)) {
             repository.increaseConfirmedEvents(event.getId(), (long) ids.size());
 
             result.setConfirmedRequests(requestMapper.toDto(requests));
@@ -323,5 +304,24 @@ public class EventServiceImpl implements EventService {
         }
 
         return commentMapper.toPublicDto(sortByIds(commentRepository.getWithCommentator(ids), ids));
+    }
+
+    private void checkEventDate(LocalDateTime eventDate, Integer hours) {
+        if (eventDate.isBefore(now().plusHours(hours))) {
+            throw new ForbiddenException("eventDate", String.format("Must not be earlier than %s h. after now", hours),
+                    ofDate(eventDate));
+        }
+    }
+
+    private void updateCategory(Event event, Long categoryId) {
+        if (categoryId != null) {
+            Category category = categoryRepository.findById(categoryId).orElse(null);
+
+            if (category == null) {
+                throw new NotFoundException(String.format("Category with id = %s was not found", categoryId));
+            }
+
+            event.setCategory(category);
+        }
     }
 }

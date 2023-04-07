@@ -60,7 +60,8 @@ class NewCategoryDtoTest {
 
     @Test
     void fromJson_withNotEmptyName_shouldReturnDtoWithNotEmptyName() throws JsonProcessingException {
-        NewCategoryDto target = objectMapper.readValue("{\"name\":\"" + validName + "\"}", NewCategoryDto.class);
+        NewCategoryDto target = objectMapper.readValue(String.format("{\"name\":\"%s\"}", validName),
+                NewCategoryDto.class);
 
         assertThat(target, hasProperty("name", equalTo(validName)));
     }
