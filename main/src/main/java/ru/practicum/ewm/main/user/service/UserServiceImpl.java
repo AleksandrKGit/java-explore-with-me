@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
         try {
             repository.deleteById(id);
         } catch (EmptyResultDataAccessException ignored) {
-            throw new NotFoundException("User with id = " + id + " was not found");
+            throw new NotFoundException(String.format("User with id = %s was not found", id));
         }
     }
 }

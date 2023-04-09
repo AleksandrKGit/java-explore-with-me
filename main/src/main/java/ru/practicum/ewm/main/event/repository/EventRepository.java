@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, Long>, EventCustomRepository {
-    @Query("SELECT e FROM Event e INNER JOIN e.initiator INNER JOIN e.category WHERE e.id = ?1")
+    @Query("SELECT e FROM Event e JOIN FETCH e.initiator JOIN FETCH e.category WHERE e.id = ?1")
     Optional<Event> get(Long id);
 
     @Query("SELECT e FROM Event e JOIN FETCH e.initiator JOIN FETCH e.category WHERE e.id IN ?1")
@@ -28,6 +28,14 @@ public interface EventRepository extends JpaRepository<Event, Long>, EventCustom
     @Modifying
     @Query("UPDATE Event e SET e.confirmedRequests = e.confirmedRequests - 1 WHERE e.id = ?1")
     void decrementConfirmedEvents(Long id);
+
+    @Modifying
+    @Query("UPDATE Event e SET e.publishedComments = e.publishedComments + ?2 WHERE e.id = ?1")
+    void increasePublishedComments(Long id, Long count);
+
+    @Modifying
+    @Query("UPDATE Event e SET e.publishedComments = e.publishedComments - ?2 WHERE e.id = ?1")
+    void decreasePublishedComments(Long id, Long count);
 
     @Query("SELECT e.id FROM Event e WHERE e.initiator.id = ?1")
     List<Long> findByInitiator(Long userId, Pageable pageable);

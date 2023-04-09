@@ -231,7 +231,7 @@ class UserAdminControllerTest {
 
         when(service.find(ids, from, size)).thenReturn(resultListDto);
 
-        mockMvc.perform(get("/admin/users?ids=" + idsParam + "&from=" + from + "&size=" + size))
+        mockMvc.perform(get(String.format("/admin/users?ids=%s&from=%s&size=%s", idsParam, from, size)))
                 .andExpect(content().json(objectMapper.writeValueAsString(resultListDto)))
                 .andExpect(status().isOk());
     }
@@ -249,7 +249,7 @@ class UserAdminControllerTest {
     @Test
     void request_withDeleteEndPointAndNotFoundExceptionThrownByServiceDeleteMethod_shouldReturnStatusNotFoundAndApiError()
             throws Exception {
-        String message = "User with id=" + validId + " was not found";
+        String message = String.format("User with id = %s was not found", validId);
         NotFoundException exception = new NotFoundException(message);
 
         doThrow(exception).when(service).delete(validId);

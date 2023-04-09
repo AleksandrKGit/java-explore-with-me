@@ -255,7 +255,7 @@ class CategoryAdminControllerTest {
     @Test
     void request_withUpdateEndPointAndNotFoundExceptionThrownByServiceCreateMethod_shouldReturnStatusNotFoundAndApiError()
             throws Exception {
-        String message = "Category with id=" + validId + " was not found";
+        String message = String.format("Category with id = %s was not found", validId);
         NotFoundException exception = new NotFoundException(message);
 
         when(service.update(eq(validId), argThat(equalTo(validUpdateDto)))).thenThrow(exception);
@@ -290,7 +290,7 @@ class CategoryAdminControllerTest {
     @Test
     void request_withDeleteEndPointAndNotFoundExceptionThrownByServiceDeleteMethod_shouldReturnStatusNotFoundAndApiError()
             throws Exception {
-        String message = "Category with id=" + validId + " was not found";
+        String message = String.format("Category with id = %s was not found", validId);
         NotFoundException exception = new NotFoundException(message);
 
         doThrow(exception).when(service).delete(validId);

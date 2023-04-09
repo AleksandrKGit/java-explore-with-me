@@ -6,7 +6,6 @@ import org.springframework.data.util.Pair;
 import ru.practicum.ewm.main.category.Category;
 import ru.practicum.ewm.main.event.model.Event;
 import ru.practicum.ewm.main.event.model.EventState;
-import ru.practicum.ewm.main.request.dto.RequestMapper;
 import ru.practicum.ewm.main.stat.StatService;
 import ru.practicum.ewm.main.user.User;
 import java.time.LocalDateTime;
@@ -17,7 +16,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 import static ru.practicum.ewm.common.support.DateFactory.DATE_FORMAT;
 
-@Mapper(componentModel = "spring", uses = RequestMapper.class, unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public abstract class EventMapper {
     @Autowired
     private StatService statService;

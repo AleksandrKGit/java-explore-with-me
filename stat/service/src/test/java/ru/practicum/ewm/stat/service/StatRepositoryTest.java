@@ -142,7 +142,7 @@ class StatRepositoryTest {
                 new ViewStats(app2, uris[0], 1L)
         );
 
-        List<ViewStats> target = repository.find(start, end, uris);
+        List<ViewStats> target = repository.findWithUris(start, end, uris);
 
         assertThat(target, contains(result.stream().map(dto -> allOf(
                 hasProperty("app", equalTo(dto.getApp())),
@@ -191,7 +191,7 @@ class StatRepositoryTest {
                 new ViewStats(app2, uris[0], 1L)
         );
 
-        List<ViewStats> target = repository.findUnique(start, end, uris);
+        List<ViewStats> target = repository.findUniqueWithUris(start, end, uris);
 
         assertThat(target, contains(result.stream().map(dto -> allOf(
                 hasProperty("app", equalTo(dto.getApp())),

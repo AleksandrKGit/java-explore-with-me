@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.ewm.main.event.model.Location;
 import ru.practicum.ewm.main.validation.constraints.DateOfPattern;
+import ru.practicum.ewm.main.validation.constraints.EventCommentsState;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -61,4 +62,7 @@ public class NewEventDto {
     @NotNull(message = "must not be null")
     @DateOfPattern(pattern = DATE_FORMAT, message = "must be of pattern: " + DATE_FORMAT)
     String eventDate;
+
+    @EventCommentsState
+    String commentsState;
 }

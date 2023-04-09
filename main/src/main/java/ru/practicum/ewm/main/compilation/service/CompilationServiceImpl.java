@@ -67,7 +67,7 @@ public class CompilationServiceImpl implements CompilationService {
         Compilation compilation = repository.get(id).orElse(null);
 
         if (compilation == null) {
-            throw new NotFoundException("Compilation with id = " + id + " was not found");
+            throw new NotFoundException(String.format("Compilation with id = %s was not found", id));
         }
 
         return mapper.toDto(compilation, true);
@@ -92,7 +92,7 @@ public class CompilationServiceImpl implements CompilationService {
                 .orElse(null);
 
         if (compilation == null) {
-            throw new NotFoundException("Compilation with id = " + id + " was not found");
+            throw new NotFoundException(String.format("Compilation with id = %s was not found", id));
         }
 
         mergeEvents(compilation, dto.getEvents());
@@ -107,7 +107,7 @@ public class CompilationServiceImpl implements CompilationService {
         try {
             repository.deleteById(id);
         } catch (EmptyResultDataAccessException ignored) {
-            throw new NotFoundException("Compilation with id = " + id + " was not found");
+            throw new NotFoundException(String.format("Compilation with id = %s was not found", id));
         }
     }
 }

@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 import ru.practicum.ewm.main.event.model.Location;
 import ru.practicum.ewm.main.validation.constraints.EventAdminSate;
 import ru.practicum.ewm.main.validation.constraints.DateOfPattern;
+import ru.practicum.ewm.main.validation.constraints.EventCommentsState;
 import ru.practicum.ewm.main.validation.constraints.NullOrNotBlank;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
@@ -59,4 +60,7 @@ public class UpdateEventAdminRequest {
 
     @EventAdminSate
     String stateAction;
+
+    @EventCommentsState
+    String commentsState;
 }

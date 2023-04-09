@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.ewm.main.event.model.Location;
 import ru.practicum.ewm.main.validation.constraints.DateOfPattern;
+import ru.practicum.ewm.main.validation.constraints.EventCommentsState;
 import ru.practicum.ewm.main.validation.constraints.EventUserSate;
 import ru.practicum.ewm.main.validation.constraints.NullOrNotBlank;
 import javax.validation.constraints.Min;
@@ -59,4 +60,7 @@ public class UpdateEventUserRequest {
 
     @EventUserSate
     String stateAction;
+
+    @EventCommentsState
+    String commentsState;
 }

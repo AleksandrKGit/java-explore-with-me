@@ -122,11 +122,11 @@ public class UserAdminControllerIntegrationTests {
         em.persist(user4);
         em.persist(user5);
         em.flush();
-        String ids = user1.getId() + "," + user2.getId() + "," + user4.getId() + "," + user5.getId();
+        String ids = String.format("%s,%s,%s,%s", user1.getId(), user2.getId(), user4.getId(), user5.getId());
         int from = 1;
         int size = 2;
 
-        mockMvc.perform(get("/admin/users?ids=" + ids + "&from=" + from + "&size=" + size))
+        mockMvc.perform(get(String.format("/admin/users?ids=%s&from=%s&size=%s", ids, from, size)))
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$[0].id", is(user2.getId()), Long.class),
@@ -148,7 +148,7 @@ public class UserAdminControllerIntegrationTests {
     @Test
     void delete_withNotExistingId_shouldReturnStatusNotFound() throws Exception {
         long notExistingId = 1000L;
-        String message = "User with id = " + notExistingId + " was not found";
+        String message = String.format("User with id = %s was not found", notExistingId);
 
         mockMvc.perform(delete("/admin/users/" + notExistingId))
                 .andExpectAll(

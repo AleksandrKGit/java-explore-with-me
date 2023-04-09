@@ -39,25 +39,25 @@ public class RequestServiceImpl implements RequestService {
         User user = userRepository.findById(userId).orElse(null);
 
         if (user == null) {
-            throw new NotFoundException("User with id = " + userId + " was not found");
+            throw new NotFoundException(String.format("User with id = %s was not found", userId));
         }
 
         Event event = eventRepository.findById(eventId).orElse(null);
 
         if (event == null) {
-            throw new NotFoundException("Event with id = " + eventId + " was not found");
+            throw new NotFoundException(String.format("Event with id = %s was not found", eventId));
         }
 
         if (event.getInitiator().getId().equals(userId)) {
             throw new ConflictException("Request by initiator cannot be added");
         }
 
-        if (!event.getState().equals(EventState.PUBLISHED)) {
-            throw new ConflictException("Event with id = " + eventId + " has not been published yet");
+        if (!EventState.PUBLISHED.equals(event.getState())) {
+            throw new ConflictException(String.format("Event with id = %s has not been published yet", eventId));
         }
 
         if (event.getParticipantLimit() > 0 && event.getParticipantLimit() <= event.getConfirmedRequests()) {
-            throw new ConflictException("Event with id = " + eventId + " has reached participants limit");
+            throw new ConflictException(String.format("Event with id = %s has reached participants limit", eventId));
         }
 
         Request request = new Request();
@@ -68,7 +68,7 @@ public class RequestServiceImpl implements RequestService {
 
         request = repository.saveAndFlush(request);
 
-        if (request.getStatus().equals(RequestStatus.CONFIRMED)) {
+        if (RequestStatus.CONFIRMED.equals(request.getStatus())) {
             eventRepository.increaseConfirmedEvents(eventId, 1L);
         }
 
@@ -80,7 +80,7 @@ public class RequestServiceImpl implements RequestService {
         User user = userRepository.findById(userId).orElse(null);
 
         if (user == null) {
-            throw new NotFoundException("User with id = " + userId + " was not found");
+            throw new NotFoundException(String.format("User with id = %s was not found", userId));
         }
 
         List<Request> requests = repository.findByRequestor_Id(userId);
@@ -94,14 +94,14 @@ public class RequestServiceImpl implements RequestService {
         Request request = repository.findById(id).orElse(null);
 
         if (request == null) {
-            throw new NotFoundException("Request with id=" + id + " was not found");
+            throw new NotFoundException(String.format("Request with id = %s was not found", id));
         }
 
-        if (request.getStatus().equals(RequestStatus.REJECTED) || request.getStatus().equals(RequestStatus.CANCELED)) {
-            throw new ConflictException("Request with id=" + id + " was rejected or canceled");
+        if (RequestStatus.REJECTED.equals(request.getStatus()) || RequestStatus.CANCELED.equals(request.getStatus())) {
+            throw new ConflictException(String.format("Request with id = %s was rejected or canceled", id));
         }
 
-        boolean decrease = request.getStatus().equals(RequestStatus.CONFIRMED);
+        boolean decrease = RequestStatus.CONFIRMED.equals(request.getStatus());
         repository.updateStatus(Set.of(id), RequestStatus.CANCELED);
         request.setStatus(RequestStatus.CANCELED);
 

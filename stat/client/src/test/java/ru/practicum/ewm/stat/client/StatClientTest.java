@@ -46,7 +46,7 @@ class StatClientTest {
     static void startServer() {
         mockStatServer = startClientAndServer(serverPort);
         serverHost = mockStatServer.remoteAddress().getHostName();
-        client = new StatClient("http://" + serverHost + ":" + serverPort, new RestTemplateBuilder());
+        client = new StatClient(String.format("http://%s:%s", serverHost, serverPort), new RestTemplateBuilder());
         objectMapper = new ObjectMapper().findAndRegisterModules();
     }
 

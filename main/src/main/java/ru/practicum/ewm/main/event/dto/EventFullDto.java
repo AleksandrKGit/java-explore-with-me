@@ -42,4 +42,8 @@ public class EventFullDto {
     Long confirmedRequests;
 
     Long views;
+
+    String commentsState;
+
+    Long publishedComments;
 }
